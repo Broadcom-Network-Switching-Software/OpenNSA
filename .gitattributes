@@ -2,3 +2,6 @@
 src/diag/openbcm_diag filter=lfs diff=lfs merge=lfs -text
 src/diag/openbcm_diag_shell filter=lfs diff=lfs merge=lfs -text
 src/diag/openbcm_no_shell filter=lfs diff=lfs merge=lfs -text
+src/diag/opennsa_no_shell filter=lfs diff=lfs merge=lfs -text
+src/diag/opennsa_diag_shell filter=lfs diff=lfs merge=lfs -text
+lib/x86-64/libopennsa.so filter=lfs diff=lfs merge=lfs -text

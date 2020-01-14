@@ -1,13 +1,10 @@
-/***************************************************************************
- *
+/*
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/Legal/LICENSE file.
  *
- * Copyright 2007-2019 Broadcom Inc. All rights reserved.
+ * Copyright 2007-2020 Broadcom Inc. All rights reserved.
  *
- ***************************************************************************
- *
- * openbcm_diag: A simple diagnostic utility to verify openbcm library.
+ * openbcm_diag_noshell: A simple diagnostic utility to verify openbcm library.
  *
  * The only thing that is does is that it scans the bus, attaches
  * all recognized Broadcom devices and attempts to perform soc_init(),
@@ -20,7 +17,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define NO_SAL_APPL
 #ifndef NO_SAL_APPL
 #include <sal/appl/sal.h>
 #include <sal/appl/config.h>

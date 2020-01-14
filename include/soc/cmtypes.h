@@ -3,7 +3,7 @@
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
- * Copyright 2005-2019 Broadcom Inc. All rights reserved.
+ * Copyright 2005-2020 Broadcom Inc. All rights reserved.
  */
 
 #ifndef _SOC_CMTYPES_H
