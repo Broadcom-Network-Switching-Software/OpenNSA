@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -576,6 +575,29 @@ typedef int (*bcm_trunk_resilient_traverse_cb)(
     bcm_trunk_resilient_entry_t *entry, 
     void *user_data);
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Traverse through the resilient trunk table and run callback at each
+ * valid entry. Possible replacement of the matched entries.
+ */
+extern int bcm_trunk_resilient_traverse(
+    int unit, 
+    uint32 flags, 
+    bcm_trunk_resilient_entry_t *match_entry, 
+    bcm_trunk_resilient_traverse_cb trav_fn, 
+    void *user_data);
+
+/* Replace Trunk resilient entries matching given criteria. */
+extern int bcm_trunk_resilient_replace(
+    int unit, 
+    uint32 flags, 
+    bcm_trunk_resilient_entry_t *match_entry, 
+    int *num_entries, 
+    bcm_trunk_resilient_entry_t *replace_entry);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 #define BCM_TRUNK_DYNAMIC_MEMBER_FORCE_DOWN 0          
 #define BCM_TRUNK_DYNAMIC_MEMBER_FORCE_UP   1          
 #define BCM_TRUNK_DYNAMIC_MEMBER_HW         2          
@@ -601,6 +623,16 @@ extern int bcm_trunk_agm_attach_get(
     int unit, 
     bcm_trunk_t trunk_id, 
     bcm_switch_agm_id_t *agm_id);
+
+/* 
+ * map a system port aggregate (SPA) to its corresponding system physical
+ * port.
+ */
+extern int bcm_trunk_spa_to_system_phys_port_map_get(
+    int unit, 
+    uint32 flags, 
+    uint32 system_port_aggregate, 
+    bcm_gport_t *gport);
 
 #endif /* BCM_HIDE_DISPATCHABLE */
 

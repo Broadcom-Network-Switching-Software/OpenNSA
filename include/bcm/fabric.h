@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -19,6 +18,17 @@
 
 #define BCM_FABRIC_PORT_EGRESS_MULTICAST    (1U<<0)    
 #define BCM_FABRIC_PORT_INGRESS_MULTICAST   (1U<<1)    
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Given a child port retrieve the parent port */
+extern int bcm_fabric_port_get(
+    int unit, 
+    bcm_gport_t child_port, 
+    uint32 flags, 
+    bcm_gport_t *parent_port);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* bcm_fabric_control_t */
 typedef enum bcm_fabric_control_e {
@@ -354,6 +364,26 @@ typedef struct bcm_fabric_control_redundancy_info_s {
 #define BCM_FABRIC_PACKET_ADJUST_EGRESS     0x20000000 
 #define BCM_FABRIC_PACKET_ADJUST_GLOBAL     0x10000000 
 #define BCM_FABRIC_PACKET_ADJUST_SELECTOR_MASK 0x0FFFFFFF 
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Initialize the BCM Fabric subsystem. */
+extern int bcm_fabric_init(
+    int unit);
+
+/* Set fabric control attributes. */
+extern int bcm_fabric_control_set(
+    int unit, 
+    bcm_fabric_control_t type, 
+    int arg);
+
+/* Set fabric control attributes. */
+extern int bcm_fabric_control_get(
+    int unit, 
+    bcm_fabric_control_t type, 
+    int *arg);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 #define BCM_FABRIC_DISTRIBUTION_SCHED_ALL   0x00000000 
 #define BCM_FABRIC_DISTRIBUTION_SCHED_ANY   0x00000001 
@@ -749,6 +779,25 @@ id & ~BCM_GROUP_MODID_BIT /* Clear group indicator */
 id & ~BCM_LOCAL_MODID_BIT   /* Clear local modid
                                                       indicator */
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Update links topology, set all the links connected to a destination */
+extern int bcm_fabric_link_topology_set(
+    int unit, 
+    bcm_module_t destination, 
+    int links_count, 
+    bcm_port_t *links_array);
+
+/* Get links topology. */
+extern int bcm_fabric_link_topology_get(
+    int unit, 
+    bcm_module_t destination, 
+    int max_links_count, 
+    int *links_count, 
+    bcm_port_t *links_array);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 #define BCM_FABRIC_MAX_MULTICAST_MODULES    (192)      /* Max number of MC
                                                           modules */
 
@@ -832,6 +881,24 @@ typedef enum bcm_fabric_link_control_e {
                                            configuration can be set only prior
                                            to setting the link into retimer. */
 } bcm_fabric_link_control_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Set\Get fabric-link attribute per link. \br */
+extern int bcm_fabric_link_control_set(
+    int unit, 
+    bcm_port_t link, 
+    bcm_fabric_link_control_t type, 
+    int arg);
+
+/* Set\Get fabric-link attribute per link. \br */
+extern int bcm_fabric_link_control_get(
+    int unit, 
+    bcm_port_t link, 
+    bcm_fabric_link_control_t type, 
+    int *arg);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 typedef struct bcm_fabric_link_remote_pipe_mapping_s {
     uint32 num_of_remote_pipes;         /* Number of pipes supported by the
@@ -1017,6 +1084,17 @@ typedef enum bcm_fabric_link_threshold_type_e {
                                                           or link down, based on
                                                           reachability cells */
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Get the status of the link */
+extern int bcm_fabric_link_status_get(
+    int unit, 
+    bcm_port_t link_id, 
+    uint32 *link_status, 
+    uint32 *errored_token_count);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 typedef enum bcm_fabric_device_type_e {
     bcmFabricDeviceTypeUnknown = 0, /* Unknown device type */
     bcmFabricDeviceTypeFE13 = 1,    /* FE13 device type */
@@ -1039,12 +1117,56 @@ typedef struct bcm_fabric_link_connectivity_s {
 
 #define BCM_FABRIC_LINK_NO_CONNECTIVITY _SHR_FABRIC_LINK_NO_CONNECTIVITY /* FABRIC_LINK_NO_CONNECTIVITY */
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Retrieves the current link-partner information of a link for all
+ * existing links
+ */
+extern int bcm_fabric_link_connectivity_status_get(
+    int unit, 
+    int link_partner_max, 
+    bcm_fabric_link_connectivity_t *link_partner_array, 
+    int *link_partner_count);
+
+/* Retrieves the current link-partner information of a single link. */
+extern int bcm_fabric_link_connectivity_status_single_get(
+    int unit, 
+    bcm_port_t link_id, 
+    bcm_fabric_link_connectivity_t *link_partner_info);
+
+/* Retrieves the links through which a remote module ID is reachable */
+extern int bcm_fabric_reachability_status_get(
+    int unit, 
+    int moduleid, 
+    int links_max, 
+    uint32 *links_array, 
+    int *links_count);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* bandwidth profile configuration */
 typedef struct bcm_fabric_bandwidth_profile_s {
     int num_links;      /* number of links/serdes */
     int rci;            /* route congestion indication */
     uint32 max_kbps;    /* maximum bandwidth (in kbps) */
 } bcm_fabric_bandwidth_profile_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Set retrieve fabric bandwidth profile on unit level */
+extern int bcm_fabric_bandwidth_profile_set(
+    int unit, 
+    int profile_count, 
+    bcm_fabric_bandwidth_profile_t *profile_array);
+
+/* Set retrieve fabric bandwidth profile on unit level */
+extern int bcm_fabric_bandwidth_profile_get(
+    int unit, 
+    int profile_count, 
+    bcm_fabric_bandwidth_profile_t *profile_array);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 #define BCM_FABRIC_TDM_USER_FIELD_MAX_SIZE  6          /* Maximum size of user
                                                           field */
@@ -1116,6 +1238,26 @@ typedef struct bcm_fabric_tdm_editing_s {
                                            CRC */
 } bcm_fabric_tdm_editing_t;
 
+/* Initialize  bcm_fabric_tdm_editing_t to a 'safe' default value. */
+extern void bcm_fabric_tdm_editing_t_init(
+    bcm_fabric_tdm_editing_t *editing);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* TDM configuration */
+extern int bcm_fabric_tdm_editing_set(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_fabric_tdm_editing_t *editing);
+
+/* TDM configuration */
+extern int bcm_fabric_tdm_editing_get(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_fabric_tdm_editing_t *editing);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 #define BCM_FABRIC_TDM_MAX_LINKS    64         /* maximum fabric links */
 
 /* tdm editing configuration */
@@ -1124,6 +1266,22 @@ typedef struct bcm_fabric_tdm_direct_routing_s {
                                            of zero implies no direct routing */
     bcm_gport_t links[BCM_FABRIC_TDM_MAX_LINKS]; /* link specification */
 } bcm_fabric_tdm_direct_routing_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* TDM routing configuration */
+extern int bcm_fabric_tdm_direct_routing_set(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_fabric_tdm_direct_routing_t *routing_info);
+
+/* TDM routing configuration */
+extern int bcm_fabric_tdm_direct_routing_get(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_fabric_tdm_direct_routing_t *routing_info);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Discard aging flags */
 #define BCM_FABRIC_CONFIG_DISCARD_AGING_ACTION_ONLY 0x0001     /* If set, only aging can
@@ -1157,6 +1315,42 @@ typedef struct bcm_fabric_config_discard_s {
                                        aging_period */
 } bcm_fabric_config_discard_t;
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Set discard aging configuration. Configuration to enable, disable
+ * aging and its settings.
+ */
+extern int bcm_fabric_config_discard_set(
+    int unit, 
+    bcm_fabric_config_discard_t *discard);
+
+/* 
+ * Set discard aging configuration. Configuration to enable, disable
+ * aging and its settings.
+ */
+extern int bcm_fabric_config_discard_get(
+    int unit, 
+    bcm_fabric_config_discard_t *discard);
+
+/* Per module configuration */
+extern int bcm_fabric_module_control_set(
+    int unit, 
+    uint32 flags, 
+    bcm_module_t modid, 
+    bcm_fabric_module_control_t control, 
+    int value);
+
+/* Per module configuration */
+extern int bcm_fabric_module_control_get(
+    int unit, 
+    uint32 flags, 
+    bcm_module_t modid, 
+    bcm_fabric_module_control_t control, 
+    int *value);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* 
  * Credit watchdog control, allowed values to:
  * bcm_fabric_control_set(unit, bcmFabricWatchdogQueueEnable, value)
@@ -1184,6 +1378,26 @@ typedef struct bcm_fabric_config_discard_s {
 #define BCM_FABRIC_PRIORITY_OCB_MIX_ONLY    _SHR_FABRIC_PRIORITY_OCB_MIX_ONLY 
 #define BCM_FABRIC_PRIORITY_OCB_ONLY_ONLY   _SHR_FABRIC_PRIORITY_OCB_ONLY_ONLY 
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Allow configuration of the fabric cell priority */
+extern int bcm_fabric_priority_set(
+    int unit, 
+    uint32 flags, 
+    bcm_cos_t ingress_pri, 
+    bcm_color_t color, 
+    int fabric_priority);
+
+/* Getting fabric cell priority configuration. */
+extern int bcm_fabric_priority_get(
+    int unit, 
+    uint32 flags, 
+    bcm_cos_t ingress_pri, 
+    bcm_color_t color, 
+    int *fabric_priority);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* Fabric route */
 typedef struct bcm_fabric_route_s {
     uint32 pipe_id;     /* Origin fabric pipe */
@@ -1191,6 +1405,26 @@ typedef struct bcm_fabric_route_s {
                            traversed links) */
     int *hop_ids;       /* Traversed links */
 } bcm_fabric_route_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Receive fabric route cells */
+extern int bcm_fabric_route_rx(
+    int unit, 
+    uint32 flags, 
+    uint32 data_out_max_size, 
+    uint32 *data_out, 
+    uint32 *data_out_size);
+
+/* Send fabric route cells */
+extern int bcm_fabric_route_tx(
+    int unit, 
+    uint32 flags, 
+    bcm_fabric_route_t *route, 
+    uint32 data_in_size, 
+    uint32 *data_in);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Packet Cell Packing (pcp) mode. */
 typedef enum bcm_fabric_pcp_mode_e {
@@ -1204,8 +1438,44 @@ typedef struct bcm_fabric_pcp_mode_config_s {
     bcm_fabric_pcp_mode_t pcp_mode; /* Mode of Packet Cell Packing (PCP) */
 } bcm_fabric_pcp_mode_config_t;
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Set/Get PCP mode per VOQ/destination device. */
+extern int bcm_fabric_pcp_dest_mode_config_set(
+    int unit, 
+    uint32 flags, 
+    bcm_module_t modid, 
+    bcm_fabric_pcp_mode_config_t *pcp_config);
+
+/* Set/Get PCP mode per VOQ/destination device. */
+extern int bcm_fabric_pcp_dest_mode_config_get(
+    int unit, 
+    uint32 flags, 
+    bcm_module_t modid, 
+    bcm_fabric_pcp_mode_config_t *pcp_config);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* Configure all-reachable minimum number of links. */
 #define BCM_FABRIC_DESTINATION_LINK_MIN_ALL_REACHABLE 1          
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Configure minimum number of links per destination device. */
+extern int bcm_fabric_destination_link_min_set(
+    int unit, 
+    uint32 flags, 
+    bcm_module_t module_id, 
+    int num_of_links);
+
+/* Configure minimum number of links per destination device. */
+extern int bcm_fabric_destination_link_min_get(
+    int unit, 
+    uint32 flags, 
+    bcm_module_t module_id, 
+    int *num_of_links);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* severity counter to indicate severity level thresholds. */
 #define BCM_FABRIC_NUM_OF_RCI_LEVELS    7          
@@ -1227,6 +1497,18 @@ typedef struct bcm_fabric_rci_config_s {
     uint32 rci_high_score_congested_links; /* high score to be used when number of
                                            congested links reaches threshold */
 } bcm_fabric_rci_config_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Set the replications in the fabric element to external faps */
+extern int bcm_fabric_static_replication_set(
+    int unit, 
+    bcm_port_t port, 
+    uint32 flags, 
+    uint32 destid_count, 
+    bcm_module_t *destid_array);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* fabric_threshold_type */
 typedef enum bcm_fabric_threshold_type_e {

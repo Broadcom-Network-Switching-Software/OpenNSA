@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -2168,6 +2167,36 @@ typedef enum bcm_stat_counter_filter_e {
 #define BCM_STAT_COUNTER_TM_COMMAND 0xFF       /* flag for dedicated engine
                                                   using TM command */
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* set counter source to filter in or out certain filter criteria. */
+extern int bcm_stat_counter_filter_set(
+    int unit, 
+    bcm_stat_counter_source_t source, 
+    bcm_stat_counter_filter_t *filter_array, 
+    int filter_count, 
+    int is_active);
+
+/* 
+ * determine which filter criteria a certain counter source is filtering
+ * out.
+ */
+extern int bcm_stat_counter_filter_get(
+    int unit, 
+    bcm_stat_counter_source_t source, 
+    int filter_max_count, 
+    bcm_stat_counter_filter_t *filter_array, 
+    int *filter_count);
+
+/* determine if counter is filtering out certain filter criterion. */
+extern int bcm_stat_counter_filter_is_active_get(
+    int unit, 
+    bcm_stat_counter_source_t source, 
+    bcm_stat_counter_filter_t filter, 
+    int *is_active);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* Initialize a stat_flex_pool_stat_info object struct. */
 extern void bcm_stat_flex_pool_stat_info_t_init(
     bcm_stat_flex_pool_stat_info_t *stat_flex_pool_stat_info);
@@ -2181,6 +2210,19 @@ typedef struct bcm_stat_egress_receive_tm_pointer_format_s {
     uint32 cast_mask;           /* Consider (or not) the cast bit when building
                                    the counter pointer. */
 } bcm_stat_egress_receive_tm_pointer_format_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Set the format of the counter pointer that is sent from egress receive
+ * tm.
+ */
+extern int bcm_stat_egress_receive_tm_pointer_format_set(
+    int unit, 
+    int flags, 
+    bcm_stat_egress_receive_tm_pointer_format_t *pointer_format);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Defines the counter database id and core */
 typedef struct bcm_stat_counter_database_s {

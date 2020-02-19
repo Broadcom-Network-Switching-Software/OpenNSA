@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -196,6 +195,16 @@ extern void bcm_stk_modid_config_t_init(
     bcm_stk_modid_config_t *pconfig);
 
 #ifndef BCM_HIDE_DISPATCHABLE
+
+/* Sets/Gets the module id. */
+extern int bcm_stk_modid_config_set(
+    int unit, 
+    bcm_stk_modid_config_t *modid);
+
+/* Sets/Gets the module id. */
+extern int bcm_stk_modid_config_get(
+    int unit, 
+    bcm_stk_modid_config_t *modid);
 
 /* Number of module identifiers used by device */
 extern int bcm_stk_modid_count(
@@ -424,6 +433,64 @@ extern int bcm_stk_module_enable(
     int nports, 
     int enable);
 
+/* Map a SAND System-Port to a Gport */
+extern int bcm_stk_sysport_gport_set(
+    int unit, 
+    bcm_gport_t sysport, 
+    bcm_gport_t gport);
+
+/* Given a SAND System-Port, get the Gport */
+extern int bcm_stk_sysport_gport_get(
+    int unit, 
+    bcm_gport_t sysport, 
+    bcm_gport_t *gport);
+
+/* Given a Gport get the SAND System-Port */
+extern int bcm_stk_gport_sysport_get(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_gport_t *sysport);
+
+/* Add or delete modid from TM-Domain. */
+extern int bcm_stk_modid_domain_add(
+    int unit, 
+    int modid, 
+    int tm_domain);
+
+/* Delete modid from TM-domain */
+extern int bcm_stk_modid_domain_delete(
+    int unit, 
+    int modid, 
+    int tm_domain);
+
+/* Get array of modid belongs to TM-Domin */
+extern int bcm_stk_modid_domain_get(
+    int unit, 
+    int tm_domain, 
+    int mod_max, 
+    int *mod_array, 
+    int *mod_count);
+
+/* Define via which Stacking-Lag the TM-Domain will be reached. */
+extern int bcm_stk_domain_stk_trunk_add(
+    int unit, 
+    int tm_domain, 
+    bcm_trunk_t stk_trunk);
+
+/* Delete a path from stacking trunk to TM-domain */
+extern int bcm_stk_domain_stk_trunk_delete(
+    int unit, 
+    int tm_domain, 
+    bcm_trunk_t stk_trunk);
+
+/* Get array of TM-Domains which are reachable by the Stacking-Lag. */
+extern int bcm_stk_domain_stk_trunk_get(
+    int unit, 
+    bcm_trunk_t stk_trunk, 
+    int domain_max, 
+    int *domain_array, 
+    int *domain_count);
+
 #endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Flags for bcm_stk_system_gport_map_create/get/destroy. */
@@ -438,5 +505,40 @@ typedef struct bcm_stk_system_gport_map_s {
     bcm_gport_t dest_gport;     /* Destination gport ID. */
     bcm_gport_t system_gport;   /* System gport ID */
 } bcm_stk_system_gport_map_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Create mapping from local gport id to system gport id */
+extern int bcm_stk_system_gport_map_create(
+    int unit, 
+    bcm_stk_system_gport_map_t *sys_gport_map);
+
+/* Get mapping from local gport id to system gport id */
+extern int bcm_stk_system_gport_map_get(
+    int unit, 
+    bcm_stk_system_gport_map_t *sys_gport_map);
+
+/* Destroy mapping from local gport id to system gport id */
+extern int bcm_stk_system_gport_map_destroy(
+    int unit, 
+    bcm_gport_t system_gport);
+
+/* Set remote mapping between local port and remote port, remote modid */
+extern int bcm_stk_modport_remote_map_set(
+    int unit, 
+    bcm_gport_t port, 
+    uint32 flags, 
+    int remote_modid, 
+    bcm_port_t remote_port);
+
+/* Get remote mapping between local port and remote port, remote modid */
+extern int bcm_stk_modport_remote_map_get(
+    int unit, 
+    bcm_gport_t port, 
+    uint32 flags, 
+    int *remote_modid, 
+    bcm_port_t *remote_port);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 #endif /* __BCM_STACK_H__ */

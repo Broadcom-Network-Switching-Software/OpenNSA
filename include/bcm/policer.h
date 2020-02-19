@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -423,6 +422,26 @@ extern int bcm_policer_traverse(
     bcm_policer_traverse_cb cb, 
     void *user_data);
 
+/* 
+ * Allocate a block of policer entries. bcm_policer_set must be
+ * called to setup the individual policers.
+ */
+extern int bcm_policer_group_create(
+    int unit, 
+    bcm_policer_group_mode_t mode, 
+    bcm_policer_t *policer_id, 
+    int *npolicers);
+
+/* 
+ * Allocate a block of policer entries. bcm_policer_set must be
+ * called to setup the individual policers.
+ */
+extern int bcm_policer_aggregate_group_create(
+    int unit, 
+    bcm_policer_aggregate_group_info_t *info, 
+    bcm_policer_t *policer_id, 
+    int *npolicers);
+
 #endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Policer group mode types */
@@ -693,6 +712,30 @@ typedef struct bcm_policer_color_resolution_s {
     bcm_color_t ingress_color;          /* ingress color */
     bcm_color_t egress_color;           /* egress color */
 } bcm_policer_color_resolution_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Set an entry in the Policer Color Decision table */
+extern int bcm_policer_color_decision_set(
+    int unit, 
+    bcm_policer_color_decision_t *policer_color_decision);
+
+/* Get an entry from the Policer Color Decision table */
+extern int bcm_policer_color_decision_get(
+    int unit, 
+    bcm_policer_color_decision_t *policer_color_decision);
+
+/* Set an entry in the Policer Color Resolution table */
+extern int bcm_policer_color_resolution_set(
+    int unit, 
+    bcm_policer_color_resolution_t *policer_color_resolution);
+
+/* Get an entry from the Policer Color Resolution table */
+extern int bcm_policer_color_resolution_get(
+    int unit, 
+    bcm_policer_color_resolution_t *policer_color_resolution);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Sources of global metering. */
 typedef enum bcm_policer_global_meter_source_e {

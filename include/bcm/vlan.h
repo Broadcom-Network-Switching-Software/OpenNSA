@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -228,6 +227,13 @@ extern int bcm_vlan_stp_get(
 extern int bcm_vlan_stp_set(
     int unit, 
     bcm_vlan_t vid, 
+    bcm_port_t port, 
+    int stp_state);
+
+/* Set spanning tree state for a port over a VLAN vector. */
+extern int bcm_vlan_vector_stp_set(
+    int unit, 
+    bcm_vlan_vector_t vlan_vector, 
     bcm_port_t port, 
     int stp_state);
 
@@ -512,6 +518,15 @@ typedef enum bcm_vlan_translate_key_e {
 
 /* Add an entry to the VLAN Translation table and assign VLAN actions. */
 extern int bcm_vlan_translate_action_add(
+    int unit, 
+    bcm_gport_t port, 
+    bcm_vlan_translate_key_t key_type, 
+    bcm_vlan_t outer_vlan, 
+    bcm_vlan_t inner_vlan, 
+    bcm_vlan_action_set_t *action);
+
+/* Add an entry to the VLAN Translation table and assign VLAN actions. */
+extern int bcm_vlan_translate_action_create(
     int unit, 
     bcm_gport_t port, 
     bcm_vlan_translate_key_t key_type, 
@@ -945,6 +960,37 @@ extern int bcm_vlan_dtag_range_traverse(
     bcm_vlan_dtag_range_traverse_cb cb, 
     void *user_data);
 
+/* Create a VLAN translation ID instance. */
+extern int bcm_vlan_translate_action_id_create(
+    int unit, 
+    uint32 flags, 
+    int *action_id);
+
+/* Destroy a VLAN translation ID instance. */
+extern int bcm_vlan_translate_action_id_destroy(
+    int unit, 
+    uint32 flags, 
+    int action_id);
+
+/* Destroy all VLAN translation ID instances. */
+extern int bcm_vlan_translate_action_id_destroy_all(
+    int unit, 
+    uint32 flags);
+
+/* Set a VLAN translation ID instance with tag actions. */
+extern int bcm_vlan_translate_action_id_set(
+    int unit, 
+    uint32 flags, 
+    int action_id, 
+    bcm_vlan_action_set_t *action);
+
+/* Get tag actions from a VLAN translation ID instance. */
+extern int bcm_vlan_translate_action_id_get(
+    int unit, 
+    uint32 flags, 
+    int action_id, 
+    bcm_vlan_action_set_t *action);
+
 #endif /* BCM_HIDE_DISPATCHABLE */
 
 /* bcm_vlan_translate_action_class_s */
@@ -955,6 +1001,33 @@ typedef struct bcm_vlan_translate_action_class_s {
     bcm_port_tag_format_class_t tag_format_class_id; /* VLAN-tag format ID */
     int vlan_translation_action_id;     /* Action ID */
 } bcm_vlan_translate_action_class_t;
+
+/* 
+ * Initialize a structure that holds both the key and the info for
+ * translate action class configuration.
+ */
+extern void bcm_vlan_translate_action_class_t_init(
+    bcm_vlan_translate_action_class_t *action_class);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Set an action ID for a specified combination of packet format ID and
+ * VLAN translation profile.
+ */
+extern int bcm_vlan_translate_action_class_set(
+    int unit, 
+    bcm_vlan_translate_action_class_t *action_class);
+
+/* 
+ * Get the action ID that is configured for a specified combination of
+ * packet format ID and VLAN edit profile.
+ */
+extern int bcm_vlan_translate_action_class_get(
+    int unit, 
+    bcm_vlan_translate_action_class_t *action_class);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Flags for the unified IPv4/IPv6 bcm_vlan_ip_t type. */
 #define BCM_VLAN_SUBNET_IP6     (1 << 14)  
@@ -2152,6 +2225,27 @@ typedef struct bcm_vlan_port_translation_s {
     uint32 vlan_edit_class_id;  /* VLAN editing profile */
 } bcm_vlan_port_translation_t;
 
+/* 
+ * Initialize a structure that holds both the key and the info for VLAN
+ * port translation configuration.
+ */
+extern void bcm_vlan_port_translation_t_init(
+    bcm_vlan_port_translation_t *vlan_port_translation);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Set translation information for a VLAN port. */
+extern int bcm_vlan_port_translation_set(
+    int unit, 
+    bcm_vlan_port_translation_t *vlan_port_translation);
+
+/* Get translation information from a VLAN port. */
+extern int bcm_vlan_port_translation_get(
+    int unit, 
+    bcm_vlan_port_translation_t *vlan_port_translation);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* Flags for bcm_vlan_queue_map_create(). */
 #define BCM_VLAN_QUEUE_MAP_WITH_ID          0x0001     
 #define BCM_VLAN_QUEUE_MAP_REPLACE          0x0002     
@@ -2344,6 +2438,19 @@ typedef struct bcm_vlan_gport_info_s {
     bcm_vlan_t vsi; 
     bcm_gport_t gport; 
 } bcm_vlan_gport_info_t;
+
+/* Init structure bcm_vlan_gport_info_t */
+extern void bcm_vlan_gport_info_t_init(
+    bcm_vlan_gport_info_t *info);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Get a virtual or physical port from the specified VLAN. */
+extern int bcm_vlan_gport_info_get(
+    int unit, 
+    bcm_vlan_gport_info_t *vlan_gport_info);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 #if defined(INCLUDE_L3)
 /* BCM_VLAN_VPN_* flags for VPN Create. */

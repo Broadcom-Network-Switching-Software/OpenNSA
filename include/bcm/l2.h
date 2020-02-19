@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -574,7 +573,53 @@ extern int bcm_l2_age_timer_get(
 
 #endif /* BCM_HIDE_DISPATCHABLE */
 
+/* Initialize an L2 learn message structure. */
+extern void bcm_l2_learn_msgs_config_t_init(
+    bcm_l2_learn_msgs_config_t *learn_msg_config);
+
 #ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Set device to distribute learning message to other devices in system
+ * and/or
+ * monitoring CPU.
+ */
+extern int bcm_l2_learn_msgs_config_set(
+    int unit, 
+    bcm_l2_learn_msgs_config_t *learn_msg_config);
+
+/* 
+ * Get device configuration for distribution of learning messages to
+ * other
+ * devices in system and/or monitoring CPU.
+ */
+extern int bcm_l2_learn_msgs_config_get(
+    int unit, 
+    bcm_l2_learn_msgs_config_t *learn_msg_config);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
+/* Initialize an L2 learn distribution structure. */
+extern void bcm_l2_addr_distribute_t_init(
+    bcm_l2_addr_distribute_t *distribution);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Per VSI set which events (learn, station move (transplant), aged-out)
+ * to inform CPU about.
+ */
+extern int bcm_l2_addr_msg_distribute_set(
+    int unit, 
+    bcm_l2_addr_distribute_t *distribution);
+
+/* 
+ * Per VSI, get which events (learn, station move (transplant), aged-out)
+ * to inform CPU about.
+ */
+extern int bcm_l2_addr_msg_distribute_get(
+    int unit, 
+    bcm_l2_addr_distribute_t *distribution);
 
 /* Temporarily stop/restore L2 table from changing. */
 extern int bcm_l2_addr_freeze(
@@ -642,6 +687,30 @@ extern int bcm_l2_cache_delete_all(
 
 #endif /* BCM_HIDE_DISPATCHABLE */
 
+/* Initialize the l2 egress structure */
+extern void bcm_l2_egress_t_init(
+    bcm_l2_egress_t *egr);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Create an l2 egress entry. */
+extern int bcm_l2_egress_create(
+    int unit, 
+    bcm_l2_egress_t *egr);
+
+/* Destroy an l2 egress entry. */
+extern int bcm_l2_egress_destroy(
+    int unit, 
+    bcm_if_t encap_id);
+
+/* Get the config of an l2 egress entry with specified encap_id. */
+extern int bcm_l2_egress_get(
+    int unit, 
+    bcm_if_t encap_id, 
+    bcm_l2_egress_t *egr);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* l2 egress traverse callback */
 typedef int (*bcm_l2_egress_traverse_cb)(
     int unit, 
@@ -665,6 +734,32 @@ extern int bcm_l2_tunnel_delete(
 /* Clear all destination L2 addresses used to trigger tunnel processing. */
 extern int bcm_l2_tunnel_delete_all(
     int unit);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
+/* Initialize an L2 learn limit structure. */
+extern void bcm_l2_learn_limit_t_init(
+    bcm_l2_learn_limit_t *limit);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Enable/Disable BCM L2 learn limit subsystem. */
+extern int bcm_l2_learn_limit_enable(
+    int unit);
+
+/* Enable/Disable BCM L2 learn limit subsystem. */
+extern int bcm_l2_learn_limit_disable(
+    int unit);
+
+/* Set/Get L2 addresses learn limit. */
+extern int bcm_l2_learn_limit_set(
+    int unit, 
+    bcm_l2_learn_limit_t *limit);
+
+/* Set/Get L2 addresses learn limit. */
+extern int bcm_l2_learn_limit_get(
+    int unit, 
+    bcm_l2_learn_limit_t *limit);
 
 #endif /* BCM_HIDE_DISPATCHABLE */
 
@@ -856,6 +951,19 @@ extern int bcm_l2_replace(
     bcm_port_t new_port, 
     bcm_trunk_t new_trunk);
 
+/* 
+ * Replace destination (or delete) multiple L2 entries matching the given
+ * address and mask. Only bits that are 1 (turned on) in the mask will be
+ * checked when checking the match.
+ */
+extern int bcm_l2_replace_match(
+    int unit, 
+    uint32 flags, 
+    bcm_l2_addr_t *match_addr, 
+    bcm_l2_addr_t *mask_addr, 
+    bcm_l2_addr_t *replace_addr, 
+    bcm_l2_addr_t *replace_mask_addr);
+
 #endif /* BCM_HIDE_DISPATCHABLE */
 
 /* L2 Forwarding Domain Type. */
@@ -1017,7 +1125,19 @@ typedef int (*bcm_l2_auth_traverse_cb)(
                                                       vlan */
 #define BCM_L2_AUTH_PERMIT_TAGGED_ONLY  0x00000004 /* permit only tagged packets */
 
+/* 
+ * Initialize an L2 SA authentication structure to a specified MAC
+ * address and VLAN ID.
+ */
+extern void bcm_l2_auth_addr_t_init(
+    bcm_l2_auth_addr_t *addr);
+
 #ifndef BCM_HIDE_DISPATCHABLE
+
+/* Add an L2 authentication entry. */
+extern int bcm_l2_auth_add(
+    int unit, 
+    bcm_l2_auth_addr_t *addr);
 
 /* 
  * Iterates over matching entries in the L2 table and executes user
@@ -1097,7 +1217,17 @@ typedef struct bcm_l2_gport_forward_info_s {
     int encap_id; 
 } bcm_l2_gport_forward_info_t;
 
+/* Initialize bcm_l2_gport_forward_info_t struct */
+extern void bcm_l2_gport_forward_info_t_init(
+    bcm_l2_gport_forward_info_t *forward_info);
+
 #ifndef BCM_HIDE_DISPATCHABLE
+
+/* Get the forwarding information for the given gport. */
+extern int bcm_l2_gport_forward_info_get(
+    int unit, 
+    int gport_id, 
+    bcm_l2_gport_forward_info_t *forward_info);
 
 /* Purge L2 Entries for the specific set of (port,vlan) pairs. */
 extern int bcm_l2_addr_delete_by_vlan_gport_multi(
@@ -1106,6 +1236,12 @@ extern int bcm_l2_addr_delete_by_vlan_gport_multi(
     int num_pairs, 
     bcm_vlan_t *vlan, 
     bcm_gport_t *gport);
+
+/* Delete multi L2 address entry from the specified device. */
+extern int bcm_l2_addr_multi_delete(
+    int unit, 
+    bcm_l2_addr_t *l2addr, 
+    int count);
 
 #endif /* BCM_HIDE_DISPATCHABLE */
 
@@ -1117,6 +1253,41 @@ typedef struct bcm_l2cp_profile_info_s {
     int nof_entries; 
     bcm_mac_t mac_add[BCM_RX_TRAP_L2CP_NOF_ENTRIES]; 
 } bcm_l2cp_profile_info_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* creates and writes down to HW the bitmap profile for L2CP traps. */
+extern int bcm_l2_cache_profile_set(
+    int unit, 
+    int trap_type, 
+    uint32 profile_idx, 
+    uint32 flags, 
+    bcm_l2cp_profile_info_t *l2cp_profile_info);
+
+/* reads from HW the bitmap profile for L2CP traps. */
+extern int bcm_l2_cache_profile_get(
+    int unit, 
+    int trap_type, 
+    uint32 profile_idx, 
+    uint32 flags, 
+    bcm_l2cp_profile_info_t *l2cp_profile_info);
+
+/* 
+ * links the given VPN to required profile index (from 0 to 3) for L2CP
+ * traps.
+ */
+extern int bcm_l2_cache_vpn_to_profile_map_set(
+    int unit, 
+    uint32 vsi, 
+    uint32 profile_idx);
+
+/* for the given VPN returns profile index (from 0 to 3) for L2CP traps. */
+extern int bcm_l2_cache_vpn_to_profile_map_get(
+    int unit, 
+    uint32 vsi, 
+    uint32 *profile_idx);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 #if defined(INCLUDE_L3)
 /* Requires BROADCOM_PREMIUM license */

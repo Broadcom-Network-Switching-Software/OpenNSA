@@ -1,21 +1,33 @@
 #
 # This software is governed by the Broadcom Switch APIs license.
-# This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
+# This license is set out in $SDK/Legal/LICENSE file.
 #
 # Copyright 2007-2020 Broadcom Inc. All rights reserved.
 #
+# Note: The version GNU BINUTILS shown below is the minimum
+# needed in order to avoid a known bug in GCC that otherwise
+# results in an internal linker error
+#"BFD (GNU Binutils) 2.22 internal error, aborting at reloc.c line 1509 in _bfd_relocate_contents"
+export BINUTILSVER = 2.27
 
 ifeq ($(SDK),)
 $(error Environment variable "$SDK" must be set)
 endif
 
-DRV_LIBS_NOSHELL = -lopennsa
-DRV_LIBS_SHELL = -Wl,--start-group -lopennsa -Wl,--end-group
+DRV_LIBS_NOSHELL = -Wl,--start-group -lopennsa -Wl,--end-group
+DRV_LIBS_SHELL = -Wl,--start-group -lopennsa -lopennsa_diag -lopennsa_cint -Wl,--end-group
+DRV_LIBS_DYN = -lopennsadyn
 
-all: opennsa_no_shell opennsa_diag_shell
+DRV_LIBS = -Wl,--start-group -lopennsa -Wl,--end-group
 
-opennsa_no_shell: opennsa_no_shell.c version.c config_init_defaults.c $(SDK)/lib/x86-64/libopennsa.a
-	gcc -I$(SDK)/include -I$(SDK)/src/sdk/gpl-modules/systems/bde/linux/include -I$(SDK)/src/sdk/gpl-modules/include -DSYS_BE_PIO=0 -DSYS_BE_PACKET=0 -DSYS_BE_OTHER=0 -DLE_HOST=1 -DNO_SAL_APPL -o $@ $^ -L$(SDK)/lib/x86-64 $(DRV_LIBS_NOSHELL) -lrt -pthread -lm
+all: demo_opennsa_init Makefile
+dnx: opennsa_diag_shell_qax
 
-opennsa_diag_shell: opennsa_diag_shell.c version.c config_init_defaults.c $(SDK)/lib/x86-64/libopennsa.a
-	gcc -I$(SDK)/include -I$(SDK)/src/sdk/gpl-modules/systems/bde/linux/include -I$(SDK)/src/sdk/gpl-modules/include -DSYS_BE_PIO=0 -DSYS_BE_PACKET=0 -DSYS_BE_OTHER=0 -DLE_HOST=1 -DNO_SAL_APPL -o $@ $^ -L$(SDK)/lib/x86-64 $(DRV_LIBS_SHELL) -lrt -pthread -lm
+demo_opennsa_init: demo_opennsa_init.c version.c config_init_defaults.c $(SDK)/lib/x86-64/libopennsa.a
+	gcc -I$(SDK)/include -I$(SDK)/src/gpl-modules/systems/bde/linux/include -I$(SDK)/src/gpl-modules/include -DBCM_ESW_SUPPORT -DSYS_BE_PIO=0 -DSYS_BE_PACKET=0 -DSYS_BE_OTHER=0 -DLE_HOST=1 -o $@ $^ -L$(SDK)/lib/x86-64 $(DRV_LIBS_SHELL) -lrt -pthread -lm
+
+opennsa_diag_shell_qax: opennsa_diag_shell.c version.c config_init_defaults.c $(SDK)/lib/mips-BCM9XLP2_XMC_A1/libopennsa.a $(SDK)/lib/mips-BCM9XLP2_XMC_A1/libopennsa_diag.a $(SDK)/lib/mips-BCM9XLP2_XMC_A1/libopennsa_cint.a
+	$(CC) -mabi=32 -I$(SDK)/include -I$(SDK)/src/gpl-modules/systems/bde/linux/include -I$(SDK)/src/gpl-modules/include -DSYS_BE_PIO=0 -DSYS_BE_PACKET=0 -DSYS_BE_OTHER=1 -DLE_HOST=1 -o $@ $^ -L$(SDK)/lib/mips-BCM9XLP2_XMC_A1 $(DRV_LIBS_SHELL) -lrt -pthread -lm
+
+opennsa_diag_shell_qax_dyn: opennsa_diag_shell.c version.c config_init_defaults.c $(SDK)/lib/mips-BCM9XLP2_XMC_A1/libopennsadyn.so
+	$(CC) -mabi=32 -I$(SDK)/include -I$(SDK)/src/gpl-modules/systems/bde/linux/include -I$(SDK)/src/gpl-modules/include -DSYS_BE_PIO=0 -DSYS_BE_PACKET=0 -DSYS_BE_OTHER=1 -DLE_HOST=1 -o $@ $^ -L$(SDK)/lib/mips-BCM9XLP2_XMC_A1 $(DRV_LIBS_DYN) -lrt -pthread -lm

@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -1727,6 +1726,10 @@ typedef struct bcm_rx_trap_config_s {
     int pp_drop_reason;                 /* Packet processing drop reason */
 } bcm_rx_trap_config_t;
 
+/* Initialize the rx_trap_config_t structure. */
+extern void bcm_rx_trap_config_t_init(
+    bcm_rx_trap_config_t *trap_config);
+
 /* User-configurable, per-unit RX configuration. */
 typedef struct bcm_rx_snoop_config_s {
     uint32 flags;               /* BCM_RX_SNOOP_XXX FLAGS. */
@@ -1744,6 +1747,69 @@ typedef struct bcm_rx_snoop_config_s {
                                    100000. */
     bcm_if_t encap_id;          /* Encap-ID */
 } bcm_rx_snoop_config_t;
+
+/* Initialize the rx_snoop_config_t structure. */
+extern void bcm_rx_snoop_config_t_init(
+    bcm_rx_snoop_config_t *snoop_config);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* rx_trap_type_create. */
+extern int bcm_rx_trap_type_create(
+    int unit, 
+    int flags, 
+    bcm_rx_trap_t type, 
+    int *trap_id);
+
+/* Get RX trap type from trap ID */
+extern int bcm_rx_trap_type_from_id_get(
+    int unit, 
+    int flags, 
+    int trap_id, 
+    bcm_rx_trap_t *trap_type);
+
+/* rx_trap_type_destroy. */
+extern int bcm_rx_trap_type_destroy(
+    int unit, 
+    int trap_id);
+
+/* rx_trap_set. */
+extern int bcm_rx_trap_set(
+    int unit, 
+    int trap_id, 
+    bcm_rx_trap_config_t *config);
+
+/* rx_trap_get. */
+extern int bcm_rx_trap_get(
+    int unit, 
+    int trap_id, 
+    bcm_rx_trap_config_t *config);
+
+/* rx_snoop_set. */
+extern int bcm_rx_snoop_set(
+    int unit, 
+    int snoop_cmnd, 
+    bcm_rx_snoop_config_t *config);
+
+/* rx_snoop_get. */
+extern int bcm_rx_snoop_get(
+    int unit, 
+    int snoop_cmnd, 
+    bcm_rx_snoop_config_t *config);
+
+/* rx_snoop_create. */
+extern int bcm_rx_snoop_create(
+    int unit, 
+    int flags, 
+    int *snoop_cmnd);
+
+/* rx_trap_type_destroy. */
+extern int bcm_rx_snoop_destroy(
+    int unit, 
+    int flags, 
+    int snoop_cmnd);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Flags for bcm_rx_trap_t. */
 #define BCM_RX_TRAP_UPDATE_DEST             0x00000001 /* update destination. */
@@ -1891,6 +1957,22 @@ typedef struct bcm_rx_mtu_config_s {
     uint32 mtu;         /* MTU value to set for LIF/RIF */
     uint8 mtu_profile;  /* MTU profile to configure */
 } bcm_rx_mtu_config_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* maps the MTU value from input to LIF/RIF value from input */
+extern int bcm_rx_mtu_set(
+    int unit, 
+    bcm_rx_mtu_config_t *config);
+
+/* Maps between SW trap id to HW trap id */
+extern int bcm_rx_trap_sw_to_hw_id_map_get(
+    int unit, 
+    uint32 flags, 
+    int sw_trap_id, 
+    int *hw_trap_id);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Copy to CPU trace event reasons bitmap structure. */
 typedef struct bcm_rx_pkt_trace_reasons_s {

@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -1384,6 +1383,29 @@ typedef int (*bcm_l3_egress_ecmp_resilient_traverse_cb)(
     bcm_l3_egress_ecmp_resilient_entry_t *entry, 
     void *user_data);
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Traverse through the resilient ecmp table and run callback at each
+ * valid entry. Possible replacement of the matched entries.
+ */
+extern int bcm_l3_egress_ecmp_resilient_traverse(
+    int unit, 
+    uint32 flags, 
+    bcm_l3_egress_ecmp_resilient_entry_t *match_entry, 
+    bcm_l3_egress_ecmp_resilient_traverse_cb trav_fn, 
+    void *user_data);
+
+/* Replace ECMP resilient entries matching given criteria. */
+extern int bcm_l3_egress_ecmp_resilient_replace(
+    int unit, 
+    uint32 flags, 
+    bcm_l3_egress_ecmp_resilient_entry_t *match_entry, 
+    int *num_entries, 
+    bcm_l3_egress_ecmp_resilient_entry_t *replace_entry);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* Initialize L3 Ingress Interface object structure. */
 extern void bcm_l3_ingress_t_init(
     bcm_l3_ingress_t *ing_intf);
@@ -1810,6 +1832,48 @@ typedef struct bcm_l3_source_bind_s {
     uint32 session_id;              /* PPPoE session ID. */
 } bcm_l3_source_bind_t;
 
+/* Initialize a bcm_l3_source_bind_t structure. */
+extern void bcm_l3_source_bind_t_init(
+    bcm_l3_source_bind_t *info);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Enable or disable l3 source binding checks on an ingress port. */
+extern int bcm_l3_source_bind_enable_set(
+    int unit, 
+    bcm_port_t port, 
+    int enable);
+
+/* 
+ * Retrieve whether l3 source binding checks are performed on an
+ * ingress port.
+ */
+extern int bcm_l3_source_bind_enable_get(
+    int unit, 
+    bcm_port_t port, 
+    int *enable);
+
+/* Add or replace an L3 source binding. */
+extern int bcm_l3_source_bind_add(
+    int unit, 
+    bcm_l3_source_bind_t *info);
+
+/* Remove an existing L3 source binding. */
+extern int bcm_l3_source_bind_delete(
+    int unit, 
+    bcm_l3_source_bind_t *info);
+
+/* Remove all existing L3 source bindings. */
+extern int bcm_l3_source_bind_delete_all(
+    int unit);
+
+/* Retrieve the details of an existing L3 source binding. */
+extern int bcm_l3_source_bind_get(
+    int unit, 
+    bcm_l3_source_bind_t *info);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 typedef int (*bcm_l3_source_bind_traverse_cb)(
     int unit, 
     bcm_l3_source_bind_t *info, 
@@ -2038,6 +2102,47 @@ extern int bcm_l3_host_stat_id_get(
 #define BCM_L3_VRRP_IPV6        0x00000002 /* VRID for IPV6 */
 #define BCM_L3_VRRP_EXTENDED    0x00000004 /* Indicate extended memory usage for
                                               VRID */
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Add VRID for the given VSI. VRID can be for IPV4 or for IPV6 (if VRRP
+ * mode supports IPV6).
+ * Adding a VRID using this API means the physical node has become the
+ * master for the virtual router
+ */
+extern int bcm_l3_vrrp_config_add(
+    int unit, 
+    uint32 flags, 
+    bcm_vlan_t vlan, 
+    uint32 vrid);
+
+/* Delete VRID for a particular VLAN/VSI, either for IPV4 or for IPV6 */
+extern int bcm_l3_vrrp_config_delete(
+    int unit, 
+    uint32 flags, 
+    bcm_vlan_t vlan, 
+    uint32 vrid);
+
+/* Delete all the VRIDs for a particular VLAN/VSI */
+extern int bcm_l3_vrrp_config_delete_all(
+    int unit, 
+    uint32 flags, 
+    bcm_vlan_t vlan);
+
+/* 
+ * Get all the VRIDs for which the physical node is master for the
+ * virtual routers on the given VLAN/VSI
+ */
+extern int bcm_l3_vrrp_config_get(
+    int unit, 
+    uint32 flags, 
+    bcm_vlan_t vlan, 
+    uint32 alloc_size, 
+    uint32 *vrid_array, 
+    uint32 *count);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* L3 Route statistics maintained per route. */
 typedef enum bcm_l3_route_stat_e {

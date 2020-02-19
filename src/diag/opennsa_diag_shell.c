@@ -1,10 +1,9 @@
 /*
- * This software is governed by the Broadcom Switch APIs license.
- * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/Legal/LICENSE file.
+ * $Id$
+ * $Copyright: (c) 2019 Broadcom Corp.
+ * All Rights Reserved.$
  *
- * Copyright 2007-2020 Broadcom Inc. All rights reserved.
- *
- * openbcm_diag_shell: A simple diagnostic utility to verify openbcm library.
+ * opennsa_diag_shell: A simple diagnostic utility to verify opennsa library.
  *
  * This utility leverages Broadcom Diag Shell to initialize the device and to allow
  * full access to diagnostics.
@@ -21,7 +20,7 @@
 #include <appl/diag/bslmgmt.h>
 #endif
 
-#include <appl/diag/openbcm_diag.h>
+#include <appl/diag/opennsa_diag.h>
 #include <bcm/init.h>
 #include <bcm/error.h>
 #include <soc/opensoc.h>

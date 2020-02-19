@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -145,5 +144,25 @@ typedef enum bcm_linkscan_trigger_event_e {
     BCM_LINKSCAN_TRIGGER_EVENT_REMOTE_FAULT = BCM_LINKSCAN_TRIGGER_EVENT_FAULT, /* Trigger link remote fault checking. */
     BCM_LINKSCAN_TRIGGER_EVENT_LOCAL_FAULT = 1 /* Trigger link local fault checking. */
 } bcm_linkscan_trigger_event_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Get/set the link event from/to Linkscan function. */
+extern int bcm_linkscan_trigger_event_set(
+    int unit, 
+    bcm_port_t port, 
+    uint32 flags, 
+    bcm_linkscan_trigger_event_t trigger_event, 
+    int enable);
+
+/* Get/set the link event from/to Linkscan function. */
+extern int bcm_linkscan_trigger_event_get(
+    int unit, 
+    bcm_port_t port, 
+    uint32 flags, 
+    bcm_linkscan_trigger_event_t trigger_event, 
+    int *enable);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 #endif /* __BCM_LINK_H__ */

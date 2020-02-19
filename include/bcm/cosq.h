@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -95,6 +94,22 @@ typedef struct bcm_cosq_pfc_config_s {
 } bcm_cosq_pfc_config_t;
 
 #ifndef BCM_HIDE_DISPATCHABLE
+
+/* Configure Priority-Based Flow Control (PFC). */
+extern int bcm_cosq_pfc_config_set(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_cos_queue_t cosq, 
+    uint32 flags, 
+    bcm_cosq_pfc_config_t *config);
+
+/* Configure Priority-Based Flow Control (PFC). */
+extern int bcm_cosq_pfc_config_get(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_cos_queue_t cosq, 
+    uint32 flags, 
+    bcm_cosq_pfc_config_t *config);
 
 /* Get or set the mapping from internal priority to CoS queue. */
 extern int bcm_cosq_port_mapping_set(
@@ -1302,6 +1317,54 @@ typedef struct bcm_cosq_gport_size_s {
     uint32 size_fadt_min;   /* additional minimal size (used mostly in FADT) */
 } bcm_cosq_gport_size_t;
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Configure/retrieve minimum and maximum queue depth color based size
+ * setting
+ */
+extern int bcm_cosq_gport_color_size_set(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_cos_queue_t cosq, 
+    bcm_color_t color, 
+    uint32 flags, 
+    bcm_cosq_gport_size_t *gport_size);
+
+/* 
+ * Configure/retrieve minimum and maximum queue depth color based size
+ * setting
+ */
+extern int bcm_cosq_gport_color_size_get(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_cos_queue_t cosq, 
+    bcm_color_t color, 
+    uint32 flags, 
+    bcm_cosq_gport_size_t *gport_size);
+
+/* Enable/Disable statistics for queue group. */
+extern int bcm_cosq_gport_stat_enable_set(
+    int unit, 
+    bcm_gport_t gport, 
+    int enable);
+
+/* Retrieve queue group statistic setting. */
+extern int bcm_cosq_gport_stat_enable_get(
+    int unit, 
+    bcm_gport_t gport, 
+    int *enable);
+
+/* Retrieve/Set Statistics */
+extern int bcm_cosq_gport_stat_get(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_cos_queue_t cosq, 
+    bcm_cosq_gport_stats_t stat, 
+    uint64 *value);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 #define BCM_COSQ_GPORT_WITH_ID              0x00000001 
 #define BCM_COSQ_GPORT_SCHEDULER            0x00000002 
 #define BCM_COSQ_GPORT_OVERLAY              0x00000004 
@@ -1473,6 +1536,12 @@ typedef struct bcm_cosq_voq_connector_gport_s {
 
 #ifndef BCM_HIDE_DISPATCHABLE
 
+/* Allocate voq connectors */
+extern int bcm_cosq_voq_connector_gport_add(
+    int unit, 
+    bcm_cosq_voq_connector_gport_t *config, 
+    bcm_gport_t *gport);
+
 /* Deletes queue group */
 extern int bcm_cosq_gport_delete(
     int unit, 
@@ -1520,6 +1589,12 @@ typedef struct bcm_cosq_ingress_queue_bundle_gport_config_s {
 } bcm_cosq_ingress_queue_bundle_gport_config_t;
 
 #ifndef BCM_HIDE_DISPATCHABLE
+
+/* Create an ingress queue bundle. */
+extern int bcm_cosq_ingress_queue_bundle_gport_add(
+    int unit, 
+    bcm_cosq_ingress_queue_bundle_gport_config_t *config, 
+    bcm_gport_t *gport);
 
 /* Get or set the mapping from internal priority to CoS queue. */
 extern int bcm_cosq_gport_mapping_set(
@@ -1661,6 +1736,26 @@ extern int bcm_cosq_gport_discard_extended_get(
 
 #ifndef BCM_HIDE_DISPATCHABLE
 
+/* 
+ * Configure/retrieve mapping of fabric egress cos level to front panel
+ * cos level.
+ */
+extern int bcm_cosq_gport_flow_control_set(
+    int unit, 
+    bcm_gport_t port, 
+    bcm_cos_t int_pri, 
+    uint32 flow_control_mask);
+
+/* 
+ * Configure/retrieve mapping of fabric egress cos level to front panel
+ * cos level.
+ */
+extern int bcm_cosq_gport_flow_control_get(
+    int unit, 
+    bcm_gport_t port, 
+    bcm_cos_t int_pri, 
+    uint32 *flow_control_mask);
+
 /* Attach/Detach the output of a GPORT to the input of a scheduler GPORT. */
 extern int bcm_cosq_gport_attach(
     int unit, 
@@ -1692,6 +1787,13 @@ extern int bcm_cosq_gport_child_get(
     bcm_cos_queue_t cosq, 
     bcm_gport_t *out_gport);
 
+/* retrieve parent scheduler for a child gport */
+extern int bcm_cosq_gport_parent_get(
+    int unit, 
+    bcm_gport_t child_port, 
+    bcm_cos_queue_t cos, 
+    bcm_gport_t *parent_port);
+
 #endif /* BCM_HIDE_DISPATCHABLE */
 
 #define BCM_COSQ_GPORT_QUEUE_ATTACH_WITH_ID 0x00000001 
@@ -1716,6 +1818,20 @@ typedef struct bcm_cosq_gport_connection_s {
     bcm_gport_t voq;            /* voq gport */
     bcm_gport_t voq_connector;  /* voq connector gport */
 } bcm_cosq_gport_connection_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* attaches VoQ connector to the VoQ */
+extern int bcm_cosq_gport_connection_set(
+    int unit, 
+    bcm_cosq_gport_connection_t *gport_connect);
+
+/* attaches VoQ connector to the VoQ */
+extern int bcm_cosq_gport_connection_get(
+    int unit, 
+    bcm_cosq_gport_connection_t *gport_connect);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 #define BCM_COSQ_DELAY_TOLERANCE_SLOW_LEVELS 7          /* Number of slow
                                                           threshold levels. */
@@ -1850,6 +1966,22 @@ typedef struct bcm_cosq_delay_tolerance_s {
                                                           profile is for push
                                                           queue. */
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Configures delay tolerance scheduling disciplines */
+extern int bcm_cosq_delay_tolerance_level_set(
+    int unit, 
+    int delay_tolerance_level, 
+    bcm_cosq_delay_tolerance_t *delay_tolerance);
+
+/* Configures delay tolerance scheduling disciplines */
+extern int bcm_cosq_delay_tolerance_level_get(
+    int unit, 
+    int delay_tolerance_level, 
+    bcm_cosq_delay_tolerance_t *delay_tolerance);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* attributes use to get a set of recommended delay tolerance values */
 typedef struct bcm_cosq_delay_tolerance_preset_attr_s {
     int rate;           /* approximately the desired credit rate in Gbps */
@@ -1877,6 +2009,32 @@ typedef struct bcm_cosq_delay_tolerance_preset_attr_s {
                                                           for push queue
                                                           profile. */
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Configure/retrieve {traffic class, dp} mapping to egress queue on a
+ * port.
+ */
+extern int bcm_cosq_gport_egress_map_set(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_cos_t ingress_pri, 
+    bcm_color_t ingress_dp, 
+    bcm_cos_queue_t offset);
+
+/* 
+ * Configure/retrieve {traffic class, dp} mapping to egress queue on a
+ * port.
+ */
+extern int bcm_cosq_gport_egress_map_get(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_cos_t ingress_pri, 
+    bcm_color_t ingress_dp, 
+    bcm_cos_queue_t *offset);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* flag values for multicast config setting */
 #define BCM_COSQ_MULTICAST_SCHEDULED    0x00000001 /* multicast scheduled values
                                                       are valid */
@@ -1896,6 +2054,34 @@ typedef struct bcm_cosq_egress_multicast_config_s {
     int unscheduled_se;         /* shared resource eligibility */
     int unscheduled_sp;         /* service pool ID */
 } bcm_cosq_egress_multicast_config_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Configure/retrieve {traffic class, dp} mapping to multicast egress
+ * configuration on a port.
+ */
+extern int bcm_cosq_gport_egress_multicast_config_set(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_cos_t ingress_pri, 
+    bcm_color_t ingress_dp, 
+    uint32 flags, 
+    bcm_cosq_egress_multicast_config_t *config);
+
+/* 
+ * Configure/retrieve {traffic class, dp} mapping to multicast egress
+ * configuration on a port.
+ */
+extern int bcm_cosq_gport_egress_multicast_config_get(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_cos_t ingress_pri, 
+    bcm_color_t ingress_dp, 
+    uint32 flags, 
+    bcm_cosq_egress_multicast_config_t *config);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* flag values for VSQ creation */
 #define BCM_COSQ_VSQ_GL         1          /* create 1 global VSQ */
@@ -1930,6 +2116,16 @@ typedef struct bcm_cosq_vsq_info_s {
     bcm_core_t core_id;     /* The core ID of the VSQ */
 } bcm_cosq_vsq_info_t;
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Create the VSQ. */
+extern int bcm_cosq_gport_vsq_create(
+    int unit, 
+    bcm_cosq_vsq_info_t *vsq_info, 
+    bcm_gport_t *vsq_gport);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 #define BCM_COSQ_VSQ_NOF_PG     8          /* The Maximum number of PGs in
                                               bundle. */
 
@@ -1949,6 +2145,54 @@ typedef struct bcm_cosq_src_vsqs_gport_config_s {
     bcm_cosq_pg_vsq_attributes_t pg_attributes[BCM_COSQ_VSQ_NOF_PG]; /* Config parameters for src based VSQs
                                            attributes. */
 } bcm_cosq_src_vsqs_gport_config_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Create the source based VSQ. */
+extern int bcm_cosq_src_vsqs_gport_add(
+    int unit, 
+    bcm_gport_t port, 
+    bcm_cosq_src_vsqs_gport_config_t *config, 
+    bcm_gport_t *src_port_vsq_gport, 
+    bcm_gport_t *pg_base_vsq_gport);
+
+/* Create the source based VSQ. */
+extern int bcm_cosq_src_vsqs_gport_get(
+    int unit, 
+    bcm_gport_t port, 
+    bcm_cosq_src_vsqs_gport_config_t *config, 
+    bcm_gport_t *src_port_vsq_gport, 
+    bcm_gport_t *pg_base_vsq_gport);
+
+/* Destroy the VSQ. */
+extern int bcm_cosq_gport_vsq_destroy(
+    int unit, 
+    bcm_gport_t vsq_gport);
+
+/* adding/deleting queue to vsq */
+extern int bcm_cosq_gport_vsq_add(
+    int unit, 
+    bcm_gport_t vsq, 
+    bcm_gport_t queue, 
+    bcm_cos_queue_t cosq);
+
+/* adding/deleting queue to vsq */
+extern int bcm_cosq_gport_vsq_delete(
+    int unit, 
+    bcm_gport_t vsq, 
+    bcm_gport_t queue, 
+    bcm_cos_queue_t cosq);
+
+/* retrieving queues that are part of vsq */
+extern int bcm_cosq_gport_vsq_get(
+    int unit, 
+    bcm_gport_t vsq, 
+    int queue_max, 
+    bcm_gport_t *queue_array, 
+    bcm_cos_queue_t *cosq_array, 
+    int *queue_count);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* flag values for threshold setting */
 #define BCM_COSQ_THRESHOLD_PER_DP           0x00000001 /* dp field meaningful */
@@ -2120,6 +2364,30 @@ typedef struct bcm_cosq_threshold_s {
 /* Initialize a COSQ threshold structure. */
 extern void bcm_cosq_threshold_t_init(
     bcm_cosq_threshold_t *threshold);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Configuring/retrieving Ingress / egress Thresholds for Flow control
+ * and Admission Control
+ */
+extern int bcm_cosq_gport_threshold_set(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_cos_queue_t cosq, 
+    bcm_cosq_threshold_t *threshold);
+
+/* 
+ * Configuring/retrieving Ingress / egress Thresholds for Flow control
+ * and Admission Control
+ */
+extern int bcm_cosq_gport_threshold_get(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_cos_queue_t cosq, 
+    bcm_cosq_threshold_t *threshold);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* cosq gport type eumerations */
 typedef enum bcm_cosq_gport_type_e {
@@ -2306,6 +2574,23 @@ typedef struct bcm_cosq_gport_info_core_s {
     uint32 flags;                       /* relevant flags */
 } bcm_cosq_gport_info_core_t;
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Getting a gport handle */
+extern int bcm_cosq_gport_handle_get(
+    int unit, 
+    bcm_cosq_gport_type_t gport_type, 
+    bcm_cosq_gport_info_t *gport_info);
+
+/* Getting a gport handle */
+extern int bcm_cosq_gport_handle_core_get(
+    int unit, 
+    bcm_core_t core, 
+    bcm_cosq_gport_info_core_t *gport_info, 
+    bcm_gport_t *out_gport);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* flow control direction type eumerations */
 typedef enum bcm_cosq_fc_direction_type_e {
     bcmCosqFlowControlGeneration = 0,   /* flow control generation */
@@ -2382,6 +2667,29 @@ typedef struct bcm_cosq_fc_endpoint_s {
 } bcm_cosq_fc_endpoint_t;
 
 #ifndef BCM_HIDE_DISPATCHABLE
+
+/* configure flow control path */
+extern int bcm_cosq_fc_path_add(
+    int unit, 
+    bcm_cosq_fc_direction_type_t fc_direction, 
+    bcm_cosq_fc_endpoint_t *source, 
+    bcm_cosq_fc_endpoint_t *target);
+
+/* retrieve flow control path information */
+extern int bcm_cosq_fc_path_get(
+    int unit, 
+    bcm_cosq_fc_direction_type_t fc_direction, 
+    bcm_cosq_fc_endpoint_t *source, 
+    int target_max, 
+    bcm_cosq_fc_endpoint_t *target, 
+    int *target_count);
+
+/* delete flow control path configuration */
+extern int bcm_cosq_fc_path_delete(
+    int unit, 
+    bcm_cosq_fc_direction_type_t fc_direction, 
+    bcm_cosq_fc_endpoint_t *source, 
+    bcm_cosq_fc_endpoint_t *target);
 
 /* 
  * Set/Unset the traffic from ingress port going to destination module
@@ -3071,6 +3379,25 @@ extern int bcm_cosq_service_pool_get(
 extern void bcm_cosq_service_pool_t_init(
     bcm_cosq_service_pool_t *service_pool);
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Maps a gport to a profile */
+extern int bcm_cosq_profile_mapping_set(
+    int unit, 
+    bcm_gport_t gport_to_map, 
+    bcm_cos_queue_t cosq, 
+    uint32 flags, 
+    bcm_switch_profile_mapping_t *profile_mapping);
+
+extern int bcm_cosq_profile_mapping_get(
+    int unit, 
+    bcm_gport_t gport_to_map, 
+    bcm_cos_queue_t cosq, 
+    uint32 flags, 
+    bcm_switch_profile_mapping_t *profile_mapping);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* Range configuration type. */
 typedef enum bcm_cosq_control_range_type_e {
     bcmCosqRangeMulticastQueue = 0,     /* Multicast QID range configuration. */
@@ -3110,6 +3437,26 @@ typedef struct bcm_cosq_range_s {
     int range_start;    /* Minimum size. */
     int range_end;      /* Maximus size. */
 } bcm_cosq_range_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Set/Get a range configuration. */
+extern int bcm_cosq_control_range_set(
+    int unit, 
+    bcm_gport_t port, 
+    uint32 flags, 
+    bcm_cosq_control_range_type_t type, 
+    bcm_cosq_range_t *range);
+
+/* Set/Get a range configuration. */
+extern int bcm_cosq_control_range_get(
+    int unit, 
+    bcm_gport_t port, 
+    uint32 flags, 
+    bcm_cosq_control_range_type_t type, 
+    bcm_cosq_range_t *range);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* resource allocation related flags. */
 #define BCM_COSQ_RSRC_ALLOC_COLOR_BLIND 0x0001     
@@ -3156,6 +3503,26 @@ typedef struct bcm_cosq_resource_amounts_s {
                                            lossless headroom. */
 } bcm_cosq_resource_amounts_t;
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Set/Get the resource allocation for a target/entity */
+extern int bcm_cosq_resource_allocation_set(
+    int unit, 
+    uint32 flags, 
+    bcm_cosq_resource_t resource, 
+    bcm_cosq_allocation_entity_t *target, 
+    bcm_cosq_resource_amounts_t *amounts);
+
+/* Set/Get the resource allocation for a target/entity */
+extern int bcm_cosq_resource_allocation_get(
+    int unit, 
+    uint32 flags, 
+    bcm_cosq_resource_t resource, 
+    bcm_cosq_allocation_entity_t *target, 
+    bcm_cosq_resource_amounts_t *amounts);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* Struct for configuring a slow factor. */
 typedef struct bcm_cosq_slow_level_s {
     int core;       /* 0, 1, BCM_CORE_ALL */
@@ -3167,6 +3534,22 @@ typedef struct bcm_cosq_slow_level_s {
 typedef struct bcm_cosq_slow_profile_attributes_s {
     uint32 max_rate; 
 } bcm_cosq_slow_profile_attributes_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Set/Get the slow factor per profile. */
+extern int bcm_cosq_slow_profile_set(
+    int unit, 
+    bcm_cosq_slow_level_t *slow_level, 
+    bcm_cosq_slow_profile_attributes_t *attr);
+
+/* Set/Get the slow factor per profile. */
+extern int bcm_cosq_slow_profile_get(
+    int unit, 
+    bcm_cosq_slow_level_t *slow_level, 
+    bcm_cosq_slow_profile_attributes_t *attr);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Total number of PFC controlled COSqs and scheduling nodes on a port. */
 #define BCM_COSQ_PFC_GPORT_COUNT    26         
@@ -3744,12 +4127,86 @@ typedef struct bcm_cosq_max_latency_pkts_s {
     uint32 latency_flow;    /* latency flow */
 } bcm_cosq_max_latency_pkts_t;
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* get cosq ingress congestion resource statistics */
+extern int bcm_cosq_icgm_resource_stat_get(
+    int unit, 
+    bcm_cosq_icgm_resource_stat_key_t *stat_key, 
+    uint64 *value);
+
+/* 
+ * The purpose of this API is to configure a delta value for a source or
+ * enable/disable a certain compensation type.
+ */
+extern int bcm_cosq_gport_pkt_size_adjust_set(
+    int unit, 
+    bcm_cosq_pkt_size_adjust_info_t *adjust_info, 
+    int delta);
+
+/* 
+ * The purpose of this API is to get the delta value configured for a
+ * certain compensation type
+ */
+extern int bcm_cosq_gport_pkt_size_adjust_get(
+    int unit, 
+    bcm_cosq_pkt_size_adjust_info_t *adjust_info, 
+    int *delta);
+
+/* Scheduler final delta mapping API */
+extern int bcm_cosq_pkt_size_adjust_delta_map_set(
+    int unit, 
+    int delta, 
+    int final_delta);
+
+/* get the final delta mapping */
+extern int bcm_cosq_pkt_size_adjust_delta_map_get(
+    int unit, 
+    int delta, 
+    int *final_delta);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* cosq ingress port drop enable modes */
 typedef enum bcm_cosq_ingress_port_drop_enable_mode_e {
     bcmCosqIngressPortDropDisable = 0, 
     bcmCosqIngressPortDropEnableHardStage = 1, 
     bcmCosqIngressPortDropEnableHardAndSoftStage = 2 
 } bcm_cosq_ingress_port_drop_enable_mode_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* set/get enable/disable cosq ingress port drop */
+extern int bcm_cosq_ingress_port_drop_enable_set(
+    int unit, 
+    bcm_port_t port, 
+    uint32 flags, 
+    int enable_mode);
+
+/* set/get enable/disable cosq ingress port drop */
+extern int bcm_cosq_ingress_port_drop_enable_get(
+    int unit, 
+    bcm_port_t port, 
+    uint32 flags, 
+    int *enable_mode);
+
+/* set/get cosq ingress port drop thresholds */
+extern int bcm_cosq_ingress_port_drop_threshold_set(
+    int unit, 
+    bcm_port_t port, 
+    uint32 flags, 
+    int priority, 
+    uint32 value);
+
+/* set/get cosq ingress port drop thresholds */
+extern int bcm_cosq_ingress_port_drop_threshold_get(
+    int unit, 
+    bcm_port_t port, 
+    uint32 flags, 
+    int priority, 
+    uint32 *value);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* 
  * Definitions used to select priority in API
@@ -3765,6 +4222,37 @@ typedef enum bcm_cosq_ingress_port_drop_enable_mode_e {
                                                           - 3 */
 #define BCM_COSQ_INGRESS_PORT_DROP_PRIORITY_TDM 15         /* user defined priority
                                                           - TDM */
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* set/get cosq ingress port drop map value */
+extern int bcm_cosq_ingress_port_drop_map_set(
+    int unit, 
+    bcm_port_t port, 
+    uint32 flags, 
+    bcm_cosq_ingress_port_drop_map_t map, 
+    uint32 key, 
+    int priority);
+
+/* set/get cosq ingress port drop map value */
+extern int bcm_cosq_ingress_port_drop_map_get(
+    int unit, 
+    bcm_port_t port, 
+    uint32 flags, 
+    bcm_cosq_ingress_port_drop_map_t map, 
+    uint32 key, 
+    int *priority);
+
+/* get cosq ingress congestion resource statistics */
+extern int bcm_cosq_max_latency_pkts_get(
+    int unit, 
+    bcm_gport_t gport, 
+    uint32 flags, 
+    int max_count, 
+    bcm_cosq_max_latency_pkts_t *max_latency_pkts, 
+    int *actual_count);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* 
  * User defined properties to be recgnized as control frames by the
@@ -4023,6 +4511,30 @@ typedef struct bcm_cosq_tas_profile_status_s {
 
 /* unmap flag: BCM_COSQ_SYSPORT_INGRESS_QUEUE_UNMAP */
 #define BCM_COSQ_SYSPORT_INGRESS_QUEUE_UNMAP 0x00000001 
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * bcm_cosq_sysport_ingress_queue_map_get and
+ * bcm_cosq_sysport_ingress_queue_map_set
+ */
+extern int bcm_cosq_sysport_ingress_queue_map_set(
+    int unit, 
+    uint32 flags, 
+    bcm_gport_t sysport, 
+    bcm_gport_t ingress_queue);
+
+/* 
+ * bcm_cosq_sysport_ingress_queue_map_get and
+ * bcm_cosq_sysport_ingress_queue_map_set
+ */
+extern int bcm_cosq_sysport_ingress_queue_map_get(
+    int unit, 
+    uint32 flags, 
+    bcm_gport_t sysport, 
+    bcm_gport_t *ingress_queue);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* strucutre holds the key parameters for the object mapping API. */
 typedef struct bcm_cosq_obj_map_key_s {

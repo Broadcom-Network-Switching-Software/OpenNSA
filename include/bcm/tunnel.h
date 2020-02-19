@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -387,6 +386,12 @@ extern int bcm_tunnel_initiator_set(
     bcm_l3_intf_t *intf, 
     bcm_tunnel_initiator_t *tunnel);
 
+/* Set the tunneling initiator parameters on an L3 interface. */
+extern int bcm_tunnel_initiator_create(
+    int unit, 
+    bcm_l3_intf_t *intf, 
+    bcm_tunnel_initiator_t *tunnel);
+
 /* Delete the tunnel association for the given L3 interface. */
 extern int bcm_tunnel_initiator_clear(
     int unit, 
@@ -406,6 +411,11 @@ extern int bcm_tunnel_initiator_traverse(
 
 /* Add a tunnel terminator for DIP-SIP key. */
 extern int bcm_tunnel_terminator_add(
+    int unit, 
+    bcm_tunnel_terminator_t *info);
+
+/* Add a tunnel terminator for DIP-SIP key. */
+extern int bcm_tunnel_terminator_create(
     int unit, 
     bcm_tunnel_terminator_t *info);
 
@@ -510,6 +520,42 @@ extern void bcm_tunnel_config_t_init(
 /* Initialize a L3 tunnel bcm_tunnel_dscp_map_t structure. */
 extern void bcm_tunnel_dscp_map_t_init(
     bcm_tunnel_dscp_map_t *dscp_info);
+
+/* 
+ * Initialize a tunnel L3 tunnel bcm_tunnel_terminator_config_key_t
+ * structure.
+ */
+extern void bcm_tunnel_terminator_config_key_t_init(
+    bcm_tunnel_terminator_config_key_t *config_key);
+
+/* 
+ * Initialize a tunnel L3 tunnel bcm_tunnel_terminator_config_action_t
+ * structure.
+ */
+extern void bcm_tunnel_terminator_config_action_t_init(
+    bcm_tunnel_terminator_config_action_t *config_action);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Add tunnel terminator config entries. */
+extern int bcm_tunnel_terminator_config_add(
+    int unit, 
+    uint32 flags, 
+    bcm_tunnel_terminator_config_key_t *config_key, 
+    bcm_tunnel_terminator_config_action_t *config_action);
+
+/* Get tunnel terminator config entries. */
+extern int bcm_tunnel_terminator_config_get(
+    int unit, 
+    bcm_tunnel_terminator_config_key_t *config_key, 
+    bcm_tunnel_terminator_config_action_t *config_action);
+
+/* Delete tunnel terminator config entries. */
+extern int bcm_tunnel_terminator_config_delete(
+    int unit, 
+    bcm_tunnel_terminator_config_key_t *config_key);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* 
  * This structure aggregates all elements that we need to configure l3

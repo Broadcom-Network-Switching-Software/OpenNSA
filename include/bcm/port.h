@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -684,6 +683,18 @@ extern int bcm_port_interface_get(
     bcm_port_t port, 
     bcm_port_if_t *intf);
 
+/* Configure or retrieve port interface configuration */
+extern int bcm_port_interface_config_set(
+    int unit, 
+    bcm_port_t port, 
+    bcm_port_interface_config_t *config);
+
+/* Configure or retrieve port interface configuration */
+extern int bcm_port_interface_config_get(
+    int unit, 
+    bcm_port_t port, 
+    bcm_port_interface_config_t *config);
+
 /* add/remove/get port */
 extern int bcm_port_get(
     int unit, 
@@ -931,6 +942,15 @@ extern int bcm_port_l3_mtu_get(
     int unit, 
     bcm_port_t port, 
     int *size);
+
+/* 
+ * Set or retrieve the current maximum encapsulated L3 packet size
+ * permitted on a port (Link-Layer MTU).
+ */
+extern int bcm_port_l3_encapsulated_mtu_set(
+    int unit, 
+    bcm_port_t port, 
+    int size);
 
 /* Get or set half-duplex flow control (jam) for a port. */
 extern int bcm_port_jam_set(
@@ -1335,6 +1355,13 @@ extern int bcm_port_link_status_get(
     int unit, 
     bcm_port_t port, 
     int *status);
+
+/* Retrieve the current link state of a port. */
+extern int bcm_port_link_state_get(
+    int unit, 
+    bcm_port_t port, 
+    uint32 flags, 
+    bcm_port_link_state_t *state);
 
 /* Clear failed link status from a port which has undergone LAG failover. */
 extern int bcm_port_link_failed_clear(
@@ -1900,6 +1927,30 @@ typedef struct bcm_port_tpid_class_s {
     uint32 tpid_class_id;               /* TPID profile. */
 } bcm_port_tpid_class_t;
 
+/* 
+ * Initialize a structure that holds both the key and the info for Port
+ * TPID class configuration.
+ */
+extern void bcm_port_tpid_class_t_init(
+    bcm_port_tpid_class_t *tpid_class);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Set VLAN tag classification for a port. Set tag-classifier for given
+ * identified TPIDs on packet.
+ */
+extern int bcm_port_tpid_class_set(
+    int unit, 
+    bcm_port_tpid_class_t *tpid_class);
+
+/* Get VLAN tag classification for a port. */
+extern int bcm_port_tpid_class_get(
+    int unit, 
+    bcm_port_tpid_class_t *tpid_class);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* bcm_port_cable_state_t */
 typedef _shr_port_cable_state_t bcm_port_cable_state_t;
 
@@ -2334,6 +2385,24 @@ extern int bcm_port_force_forward_mode_get(
     bcm_port_t port, 
     bcm_port_t *egr_port, 
     uint32 *flags);
+
+/* 
+ * Get or set the destination of a packet (recycled-path) for the second
+ * pass.
+ */
+extern int bcm_port_force_dest_set(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_port_dest_info_t *dest_info);
+
+/* 
+ * Get or set the destination of a packet (recycled-path) for the second
+ * pass.
+ */
+extern int bcm_port_force_dest_get(
+    int unit, 
+    bcm_gport_t gport, 
+    bcm_port_dest_info_t *dest_info);
 
 #endif /* BCM_HIDE_DISPATCHABLE */
 
@@ -3334,6 +3403,10 @@ extern void bcm_port_ability_t_init(
 extern void bcm_phy_config_t_init(
     bcm_phy_config_t *config);
 
+/* Initializes the bcm_port_interface_config_t structure. */
+extern void bcm_port_interface_config_t_init(
+    bcm_port_interface_config_t *config);
+
 /* Initialize a Port Configuration structure. */
 extern void bcm_port_config_t_init(
     bcm_port_config_t *pconfig);
@@ -3954,6 +4027,18 @@ extern int bcm_port_local_get(
 #define BCM_PORT_INTERNAL_CONF_SCOPE_CORE0  0x0010     
 #define BCM_PORT_INTERNAL_CONF_SCOPE_CORE1  0x0020     
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Get handles to internal ports. */
+extern int bcm_port_internal_get(
+    int unit, 
+    uint32 flags, 
+    int internal_ports_max, 
+    bcm_gport_t *internal_gport, 
+    int *internal_ports_count);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* Backward compatibility. */
 typedef _shr_port_stp_t bcm_port_stp_t;
 
@@ -3974,6 +4059,22 @@ typedef _shr_port_stp_t bcm_port_stp_t;
     bcm_port_untagged_vlan_get((u), (p), &((vdata)->vlan_tag)), \
     bcm_vlan_port_get((u), (vdata)->vlan_tag, \
                       &((vdata)->port_bitmap), &((vdata)->ut_port_bitmap)) 
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Retrieve the Policer ID associated for the specified physical port. */
+extern int bcm_port_policer_get(
+    int unit, 
+    bcm_port_t port, 
+    bcm_policer_t *policer_id);
+
+/* Set the Policer ID associated for the specified physical port. */
+extern int bcm_port_policer_set(
+    int unit, 
+    bcm_port_t port, 
+    bcm_policer_t policer_id);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Types of statistics that are maintained per gport. */
 typedef enum bcm_port_stat_e {
@@ -5200,12 +5301,56 @@ extern int bcm_port_stat_counter_set(
     uint32 *counter_indexes, 
     bcm_stat_value_t *counter_values);
 
+/* Set the encapsulation to port mapping from encap_id to port. */
+extern int bcm_port_encap_map_set(
+    int unit, 
+    uint32 flags, 
+    bcm_if_t encap_id, 
+    bcm_gport_t port);
+
+/* Get the encapsulation to port mapping from encap_id. */
+extern int bcm_port_encap_map_get(
+    int unit, 
+    uint32 flags, 
+    bcm_if_t encap_id, 
+    bcm_gport_t *port);
+
 #endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Allow remapping an encapsulation to a port on a different core. */
 #define BCM_PORT_ENCAP_MAP_ALLOW_CORE_CHANGE 1          
 
 #define BCM_PORT_PON_TUNNEL_WITH_ID 0x01       
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Add service classifications(tunnel-port-ids) per pon port. */
+extern int bcm_port_pon_tunnel_add(
+    int unit, 
+    bcm_gport_t pon_port, 
+    uint32 flags, 
+    bcm_gport_t *tunnel_port_id);
+
+/* Remove service classifications(tunnel-port-ids) per pon port. */
+extern int bcm_port_pon_tunnel_remove(
+    int unit, 
+    bcm_gport_t tunnel_port_id);
+
+/* Set the tunnel id to the service class mapping */
+extern int bcm_port_pon_tunnel_map_set(
+    int unit, 
+    bcm_gport_t pon_port, 
+    bcm_tunnel_id_t tunnel_id, 
+    bcm_gport_t tunnel_port_id);
+
+/* Get the tunnel id to the service class mapping */
+extern int bcm_port_pon_tunnel_map_get(
+    int unit, 
+    bcm_gport_t pon_port, 
+    bcm_tunnel_id_t tunnel_id, 
+    bcm_gport_t *tunnel_port_id);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Statistics threshold flag. */
 #define BCM_STAT_THRESHOLD_FLAGS_NOT    (1 << 0)   
@@ -5312,6 +5457,34 @@ typedef struct bcm_port_extender_mapping_info_s {
     bcm_vlan_t vlan;            /* VLAN-ID */
     uint32 user_define_value;   /* User define value from header */
 } bcm_port_extender_mapping_info_t;
+
+/* Initialize a port extender mapping struct. */
+extern void bcm_port_extender_mapping_info_t_init(
+    bcm_port_extender_mapping_info_t *mapping_info);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Configure/retrieve port extender mapping from different inputs to
+ * Local pp port.
+ */
+extern int bcm_port_extender_mapping_info_set(
+    int unit, 
+    uint32 flags, 
+    bcm_port_extender_mapping_type_t type, 
+    bcm_port_extender_mapping_info_t *mapping_info);
+
+/* 
+ * Configure/retrieve port extender mapping from different inputs to
+ * Local pp port.
+ */
+extern int bcm_port_extender_mapping_info_get(
+    int unit, 
+    uint32 flags, 
+    bcm_port_extender_mapping_type_t type, 
+    bcm_port_extender_mapping_info_t *mapping_info);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Define vxlan vpn assignment criteria type */
 typedef enum bcm_port_vxlan_vpn_assignment_criteria_e {
@@ -5575,6 +5748,18 @@ extern int bcm_port_resource_speed_multi_set(
 extern int bcm_port_fast_reboot_traffic_enable(
     int unit);
 
+/* Set the list of enabled TDM ports. */
+extern int bcm_port_ingress_tdm_failover_set(
+    int unit, 
+    int flag, 
+    bcm_pbmp_t tdm_enable_pbmp);
+
+/* Get the list of enabled TDM ports. */
+extern int bcm_port_ingress_tdm_failover_get(
+    int unit, 
+    int flag, 
+    bcm_pbmp_t *tdm_enable_pbmp);
+
 /* Assign/retrieve the Priority Group mapped to the input priority. */
 extern int bcm_port_priority_group_mapping_set(
     int unit, 
@@ -5755,6 +5940,26 @@ typedef struct bcm_port_redirect_config_s {
 typedef struct bcm_port_nif_prio_s {
     int priority_level; /* NIF Priority level to set/get */
 } bcm_port_nif_prio_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Set/Get port NIF priority. */
+extern int bcm_port_nif_priority_set(
+    int unit, 
+    bcm_gport_t local_port, 
+    uint32 flags, 
+    bcm_port_nif_prio_t *priority, 
+    bcm_pbmp_t *affected_ports);
+
+/* Set/Get port NIF priority. */
+extern int bcm_port_nif_priority_get(
+    int unit, 
+    bcm_gport_t local_port, 
+    uint32 flags, 
+    bcm_port_nif_prio_t *priority, 
+    bcm_pbmp_t *affected_ports);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* E2EFC modes */
 typedef enum bcm_port_e2efc_mode_e {

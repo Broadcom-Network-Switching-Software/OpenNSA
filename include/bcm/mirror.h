@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -517,6 +516,14 @@ extern int bcm_mirror_mode_set(
 
 #endif /* BCM_HIDE_DISPATCHABLE */
 
+/* Initialize a bcm_mirror_options_t structure. */
+extern void bcm_mirror_options_t_init(
+    bcm_mirror_options_t *mirror_dest);
+
+/* Initialize a bcm_mirror_pkt_header_updates_t  structure. */
+extern void bcm_mirror_pkt_header_updates_t_init(
+    bcm_mirror_pkt_header_updates_t *mirror_dest);
+
 /* Initialize a bcm_bcm_mirror_destination_t structure. */
 extern void bcm_mirror_destination_t_init(
     bcm_mirror_destination_t *mirror_dest);
@@ -639,6 +646,17 @@ extern int bcm_mirror_port_dest_add(
     uint32 flags, 
     bcm_gport_t mirror_dest_id);
 
+/* 
+ * An extended version of bcm_mirror_port_dest_add using a
+ * bcm_mirror_options_t argument
+ */
+extern int bcm_mirror_port_destination_add(
+    int unit, 
+    bcm_port_t port, 
+    uint32 flags, 
+    bcm_gport_t mirror_dest, 
+    bcm_mirror_options_t options);
+
 /* bcm_mirror_port_dest_delete */
 extern int bcm_mirror_port_dest_delete(
     int unit, 
@@ -661,12 +679,84 @@ extern int bcm_mirror_port_dest_get(
     bcm_gport_t *mirror_dest, 
     int *mirror_dest_count);
 
+/* 
+ * An extended version of bcm_mirror_port_dest_get using a
+ * bcm_mirror_options_t argument
+ */
+extern int bcm_mirror_port_destination_get(
+    int unit, 
+    bcm_port_t port, 
+    uint32 flags, 
+    int mirror_dest_size, 
+    bcm_gport_t *mirror_dest, 
+    int *mirror_dest_count, 
+    bcm_mirror_options_t *options);
+
 #endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Backward compatibility. */
 #define bcm_mirror_mode         bcm_mirror_mode_set 
 
 #ifndef BCM_HIDE_DISPATCHABLE
+
+/* mirror_port_vlan_dest_add */
+extern int bcm_mirror_port_vlan_dest_add(
+    int unit, 
+    bcm_port_t port, 
+    bcm_vlan_t vlan, 
+    uint32 flags, 
+    bcm_gport_t destid);
+
+/* 
+ * An extended version of  mirror_port_vlan_dest_add using a
+ * bcm_mirror_options_t argument
+ */
+extern int bcm_mirror_port_vlan_destination_add(
+    int unit, 
+    bcm_port_t port, 
+    bcm_vlan_t vlan, 
+    uint32 flags, 
+    bcm_gport_t destid, 
+    bcm_mirror_options_t options);
+
+/* bcm_mirror_port_vlan_dest_delete */
+extern int bcm_mirror_port_vlan_dest_delete(
+    int unit, 
+    bcm_port_t port, 
+    bcm_vlan_t vlan, 
+    uint32 flags, 
+    bcm_gport_t destid);
+
+/* bcm_mirror_port_dest_delete_all */
+extern int bcm_mirror_port_vlan_dest_delete_all(
+    int unit, 
+    bcm_port_t port, 
+    bcm_vlan_t vlan, 
+    uint32 flags);
+
+/* bcm_mirror_port_vlan_dest_gett */
+extern int bcm_mirror_port_vlan_dest_get(
+    int unit, 
+    bcm_port_t port, 
+    bcm_vlan_t vlan, 
+    uint32 flags, 
+    uint32 mirror_dest_size, 
+    bcm_gport_t *destid, 
+    uint32 *destcount);
+
+/* 
+ * An extended version bcm_mirror_port_vlan_dest_get of using a
+ * bcm_mirror_options_t argument
+ */
+extern int bcm_mirror_port_vlan_destination_get(
+    int unit, 
+    bcm_port_t port, 
+    bcm_vlan_t vlan, 
+    uint32 flags, 
+    uint32 mirror_dest_size, 
+    bcm_gport_t *destid, 
+    uint32 *destcount, 
+    bcm_mirror_options_t *options);
 
 /* Set values of one or more payload zeroing parameters */
 extern int bcm_mirror_payload_zero_control_multi_set(
@@ -694,6 +784,28 @@ extern void bcm_mirror_payload_zero_info_t_init(
 typedef struct bcm_mirror_port_info_s {
     bcm_gport_t mirror_system_id;   /* Unique mirror System identifier. */
 } bcm_mirror_port_info_t;
+
+/* Initialize a bcm_mirror_port_info_t structure. */
+extern void bcm_mirror_port_info_t_init(
+    bcm_mirror_port_info_t *info);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* bcm_mirror_port_info_set */
+extern int bcm_mirror_port_info_set(
+    int unit, 
+    bcm_port_t port, 
+    uint32 flags, 
+    bcm_mirror_port_info_t *info);
+
+/* bcm_mirror_port_info_get */
+extern int bcm_mirror_port_info_get(
+    int unit, 
+    bcm_port_t port, 
+    uint32 flags, 
+    bcm_mirror_port_info_t *info);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* 
  * Invalid mirror/snoop profile value, used in bcm_mirror_port_dest_get
@@ -781,6 +893,28 @@ typedef struct bcm_mirror_header_info_s {
     bcm_mirror_pkt_dnx_pp_header_t pp;  /* PP header */
     bcm_pkt_dnx_udh_t udh[4];           /* UDH header */
 } bcm_mirror_header_info_t;
+
+/* Initialize a bcm_mirror_header_info_t structure. */
+extern void bcm_mirror_header_info_t_init(
+    bcm_mirror_header_info_t *mirror_header_info);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Set system header information. */
+extern int bcm_mirror_header_info_set(
+    int unit, 
+    uint32 flags, 
+    bcm_gport_t mirror_dest_id, 
+    bcm_mirror_header_info_t *mirror_header_info);
+
+/* Get system header information. */
+extern int bcm_mirror_header_info_get(
+    int unit, 
+    bcm_gport_t mirror_dest_id, 
+    uint32 *flags, 
+    bcm_mirror_header_info_t *mirror_header_info);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Denotes that profile is used by Field Processor Module */
 #define BCM_MIRROR_PAYLOAD_ZERO_FP  (1 << 0)   

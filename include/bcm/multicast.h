@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -240,6 +239,14 @@ extern int bcm_multicast_niv_encap_get(
     bcm_gport_t niv_port_id, 
     bcm_if_t *encap_id);
 
+/* Get the multicast encapsulation ID for L2GRE replication. */
+extern int bcm_multicast_l2gre_encap_get(
+    int unit, 
+    bcm_multicast_t group, 
+    bcm_gport_t port, 
+    bcm_gport_t l2gre_port_id, 
+    bcm_if_t *encap_id);
+
 /* Get the multicast encapsulation ID for VXLAN replication. */
 extern int bcm_multicast_vxlan_encap_get(
     int unit, 
@@ -297,6 +304,42 @@ extern int bcm_multicast_egress_set(
  * a multicast group's replication list.
  */
 extern int bcm_multicast_egress_get(
+    int unit, 
+    bcm_multicast_t group, 
+    int port_max, 
+    bcm_gport_t *port_array, 
+    bcm_if_t *encap_id_array, 
+    int *port_count);
+
+/* Add a port to a Ingress Multicast group's replication list. */
+extern int bcm_multicast_ingress_add(
+    int unit, 
+    bcm_multicast_t group, 
+    bcm_gport_t port, 
+    bcm_if_t encap_id);
+
+/* Delete a port from Ingress Multicast group's replication list. */
+extern int bcm_multicast_ingress_delete(
+    int unit, 
+    bcm_multicast_t group, 
+    bcm_gport_t port, 
+    bcm_if_t encap_id);
+
+/* bcm_multicast_egress_delete_all */
+extern int bcm_multicast_ingress_delete_all(
+    int unit, 
+    bcm_multicast_t group);
+
+/* Add a set of ports to a Ingress multicast group's replication list. */
+extern int bcm_multicast_ingress_set(
+    int unit, 
+    bcm_multicast_t group, 
+    int port_count, 
+    bcm_gport_t *port_array, 
+    bcm_if_t *encap_id_array);
+
+/* bcm_multicast_ingress_get */
+extern int bcm_multicast_ingress_get(
     int unit, 
     bcm_multicast_t group, 
     int port_max, 
@@ -389,6 +432,43 @@ typedef struct bcm_multicast_replication_s {
                                                           determines if encap1
                                                           is a routing interface
                                                           or not. */
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Set or Get all the replicataions of a multicast group. */
+extern int bcm_multicast_get(
+    int unit, 
+    bcm_multicast_t group, 
+    uint32 flags, 
+    int replication_max, 
+    bcm_multicast_replication_t *out_rep_array, 
+    int *rep_count);
+
+/* Set or Get all the replicataions of a multicast group. */
+extern int bcm_multicast_set(
+    int unit, 
+    bcm_multicast_t group, 
+    uint32 flags, 
+    int nof_replications, 
+    bcm_multicast_replication_t *rep_array);
+
+/* Delete or add replications of a multicast group. */
+extern int bcm_multicast_delete(
+    int unit, 
+    bcm_multicast_t group, 
+    uint32 flags, 
+    int nof_replications, 
+    bcm_multicast_replication_t *rep_array);
+
+/* Delete or add replications of a multicast group. */
+extern int bcm_multicast_add(
+    int unit, 
+    bcm_multicast_t group, 
+    uint32 flags, 
+    int nof_replications, 
+    bcm_multicast_replication_t *rep_array);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* 
  * Can be use for  setting flags parameter  to 

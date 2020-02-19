@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -5291,6 +5290,24 @@ typedef struct bcm_switch_event_control_s {
                                            indicated event. */
 } bcm_switch_event_control_t;
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Set event control. */
+extern int bcm_switch_event_control_set(
+    int unit, 
+    bcm_switch_event_t event, 
+    bcm_switch_event_control_t type, 
+    uint32 value);
+
+/* Get event control. */
+extern int bcm_switch_event_control_get(
+    int unit, 
+    bcm_switch_event_t event, 
+    bcm_switch_event_control_t type, 
+    uint32 *value);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 typedef enum bcm_switch_bst_tracking_mode_e {
     bcmSwitchBstTrackCurrent = 0,   /* Track the current usage. */
     bcmSwitchBstTrackPeak = 1       /* Track the peak usage. */
@@ -5316,6 +5333,28 @@ extern void bcm_switch_network_group_config_t_init(
 typedef enum bcm_switch_user_buffer_type_e {
     bcmSwitchUserBufferTypeDram = 0 /* Dram User Buffer. */
 } bcm_switch_user_buffer_type_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Writes data to the user buffer */
+extern int bcm_switch_user_buffer_write(
+    int unit, 
+    uint32 flags, 
+    bcm_switch_user_buffer_type_t buff_type, 
+    uint8 *buf, 
+    int offset, 
+    int nbytes);
+
+/* Reads data from the user buffer */
+extern int bcm_switch_user_buffer_read(
+    int unit, 
+    uint32 flags, 
+    bcm_switch_user_buffer_type_t buff_type, 
+    uint8 *buf, 
+    int offset, 
+    int nbytes);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* header selection for trunk hashing */
 #define BCM_SWITCH_USER_BUFFER_LOGICAL2PHY_TRANS 0x00000001 /* User buffer flag for
@@ -5471,6 +5510,22 @@ typedef enum bcm_switch_control_mc_queue_config_mode_e {
  */
 typedef uint32 bcm_l3_protocol_group_id_t;
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Assign/get protocol groups for multiple mymac termination */
+extern int bcm_switch_l3_protocol_group_set(
+    int unit, 
+    uint32 group_members, 
+    bcm_l3_protocol_group_id_t group_id);
+
+/* Assign/get protocol groups for multiple mymac termination */
+extern int bcm_switch_l3_protocol_group_get(
+    int unit, 
+    uint32 *group_members, 
+    bcm_l3_protocol_group_id_t *group_id);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* profile mapping type. */
 typedef enum bcm_switch_profile_mapping_type_e {
     bcmCosqIngressQueueToRateClass = 0, /* ingress queue to rate class mapping */
@@ -5529,6 +5584,37 @@ typedef struct bcm_switch_tpid_info_s {
                                                       Guide PP document for full
                                                       details */
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Add a global TPID. */
+extern int bcm_switch_tpid_add(
+    int unit, 
+    uint32 options, 
+    bcm_switch_tpid_info_t *tpid_info);
+
+/* Delete a global TPID. */
+extern int bcm_switch_tpid_delete(
+    int unit, 
+    bcm_switch_tpid_info_t *tpid_info);
+
+/* Delete all global TPIDs. */
+extern int bcm_switch_tpid_delete_all(
+    int unit);
+
+/* Get a global TPID. */
+extern int bcm_switch_tpid_get(
+    int unit, 
+    bcm_switch_tpid_info_t *tpid_info);
+
+/* Get global TPID count or TPIDs. */
+extern int bcm_switch_tpid_get_all(
+    int unit, 
+    int size, 
+    bcm_switch_tpid_info_t *tpid_info_array, 
+    int *count);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* TPID class match type. */
 typedef enum bcm_switch_tpid_class_match_e {
     bcmSwitchTpidClassMatchPort = 0,    /* tpid_class_id from port. */
@@ -5550,6 +5636,18 @@ typedef struct bcm_switch_tpid_class_s {
 /* Initialize a bcm_switch_tpid_class_t structure. */
 extern void bcm_switch_tpid_class_t_init(
     bcm_switch_tpid_class_t *tpid_class);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Get the tpid profile from a given port or ingress vlan translation
+ * action ID.
+ */
+extern int bcm_switch_tpid_class_get(
+    int unit, 
+    bcm_switch_tpid_class_t *tpid_class);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* packet trace lookup result enums */
 typedef enum bcm_switch_pkt_trace_lookup_e {
@@ -5918,6 +6016,20 @@ typedef struct bcm_switch_control_info_s {
     int value;  /* Switch control value */
 } bcm_switch_control_info_t;
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Configure port-specific and device-wide operating modes. Device wide
+ * operating
+ * modes are configured on all ports, except the stack ports.
+ */
+extern int bcm_switch_control_indexed_set(
+    int unit, 
+    bcm_switch_control_key_t key, 
+    bcm_switch_control_info_t value);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* 
  * Specified MAC address is used as destination MAC address when BCM
  * SWITCH device sends OLP encapsulated pkt from specified port towards
@@ -6232,6 +6344,15 @@ typedef struct bcm_switch_dram_vendor_info_s {
     uint32 manufacture_id;  /* Manufacture Id */
 } bcm_switch_dram_vendor_info_t;
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Get dram vendor info */
+extern int bcm_switch_dram_vendor_info_get(
+    int unit, 
+    bcm_switch_dram_vendor_info_t *info);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* Thermo sensors enum */
 typedef enum bcm_switch_thermo_sensor_type_e {
     bcmSwitchThermoSensorInvalid = 0, 
@@ -6247,6 +6368,23 @@ typedef struct bcm_switch_thermo_sensor_s {
     int thermo_sensor_max;      /* thermo sensor maximal read */
     int thermo_sensor_current;  /* thermo sensor current read */
 } bcm_switch_thermo_sensor_t;
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Get switch thermo sensor data */
+extern int bcm_switch_thermo_sensor_read(
+    int unit, 
+    bcm_switch_thermo_sensor_type_t sensor_type, 
+    int interface_id, 
+    bcm_switch_thermo_sensor_t *sensor_data);
+
+/* An API to get the Recommended Operational Value. */
+extern int bcm_switch_rov_get(
+    int unit, 
+    uint32 flags, 
+    uint32 *rov);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 #define BCM_SWITCH_SDK_TO_WARMBOOT_VERSION_GET(_major_release, _minor_release, _patch_level, _warmboot_ver)  \
     (_warmboot_ver) = ((((_major_release) & 0xFF) << 16 ) | (((_minor_release) & 0xFF) << 8 ) | (((_patch_level) & 0xFF))) 
@@ -6981,11 +7119,38 @@ typedef struct bcm_switch_encap_dest_s {
     bcm_gport_t gport;  /* Gport for Destination. */
 } bcm_switch_encap_dest_t;
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Delete the encap id to destination mapping entry with the given
+ * encap_id.
+ */
+extern int bcm_switch_encap_dest_map_delete(
+    int unit, 
+    bcm_switch_encap_dest_t *encap_info);
+
+/* Get the destination with the given encap_id. */
+extern int bcm_switch_encap_dest_map_get(
+    int unit, 
+    bcm_switch_encap_dest_t *encap_info);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* Switch encap dest map traverse callback. */
 typedef int (*bcm_switch_encap_dest_map_traverse_cb)(
     int unit, 
     bcm_switch_encap_dest_t *encap_info, 
     void *user_data);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Traverse the all added encap id to destination mapping entries. */
+extern int bcm_switch_encap_dest_map_traverse(
+    int unit, 
+    bcm_switch_encap_dest_map_traverse_cb cb_fn, 
+    void *user_data);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
 
 /* Values passed for setting switch control bcmSwitchMactAgeRefreshMode. */
 typedef enum bcm_switch_age_refresh_mode_e {

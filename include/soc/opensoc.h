@@ -1,4 +1,5 @@
 /*
+ * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -118,8 +119,6 @@ extern int soc_cmicx_miim_divider_set_ring(int unit, int ring_index,
                                            int out_delay);
 extern int soc_miim_write(int unit, uint16 phy_id,
                           uint8 phy_reg_addr, uint16 phy_wr_data);
-extern uint32 soc_pci_read(int unit, uint32 addr);
-extern int soc_pci_write(int unit, uint32 addr, uint32 data);
 
 /*
  * -----------------------------------------------------------------------
@@ -138,7 +137,7 @@ extern int soc_pci_write(int unit, uint32 addr, uint32 data);
 #define CMIC_LED_REG_SIZE               4
 
 /* Trident Switch introduces two LED processors. LED0 handles first 36 ports
- * LED1 handles the remaining 36 ports.  
+ * LED1 handles the remaining 36 ports.
  */
 #define CMICE_LEDUP0_CTRL               0x00001000
 #define CMICE_LEDUP0_STATUS             0x00001004

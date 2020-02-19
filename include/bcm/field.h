@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -8112,6 +8111,20 @@ typedef struct bcm_field_qual_ce_info_s {
 /* Opaque handle to a field presel. */
 typedef int bcm_field_presel_t;
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Create a preselection specification */
+extern int bcm_field_presel_create(
+    int unit, 
+    bcm_field_presel_t *presel_id);
+
+/* Create a preselection specification using a specific ID */
+extern int bcm_field_presel_create_id(
+    int unit, 
+    bcm_field_presel_t presel_id);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* Description of a group hw information. */
 typedef struct bcm_field_group_presel_info_s {
     bcm_field_presel_t presel_id;       /* Presel Id for the given group hw info */
@@ -8413,6 +8426,15 @@ extern int bcm_field_group_traverse(
     int unit, 
     bcm_field_group_traverse_cb callback, 
     void *user_data);
+
+/* 
+ * Destroys field entries in the given group (both software object and
+ * the actual hardware entry) before destroying the field group. Field
+ * group sw object is also destroyed as well.
+ */
+extern int bcm_field_group_flush(
+    int unit, 
+    bcm_field_group_t group);
 
 /* Change or retrieve the qualifiers for a field group. */
 extern int bcm_field_group_set(
@@ -8717,6 +8739,12 @@ extern int bcm_field_entry_install(
 
 #ifndef BCM_HIDE_DISPATCHABLE
 
+/* Install a field entry into large direct lookup hardware tables */
+extern int bcm_field_entry_install_and_handler_update(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_entry_t *large_dt_entry);
+
 /* Re-install a field entry into the hardware tables */
 extern int bcm_field_entry_reinstall(
     int unit, 
@@ -8892,6 +8920,13 @@ extern int bcm_field_qualify_OutPort(
 
 /* bcm_field_qualify_InPorts */
 extern int bcm_field_qualify_InPorts(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_pbmp_t data, 
+    bcm_pbmp_t mask);
+
+/* bcm_field_qualify_OutPorts */
+extern int bcm_field_qualify_OutPorts(
     int unit, 
     bcm_field_entry_t entry, 
     bcm_pbmp_t data, 
@@ -9337,6 +9372,13 @@ extern int bcm_field_qualify_Ip6TrafficClass(
     uint8 data, 
     uint8 mask);
 
+/* bcm_field_qualify_InnerIp6FlowLabel */
+extern int bcm_field_qualify_InnerIp6FlowLabel(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
 /* bcm_field_qualify_Ip6FlowLabel */
 extern int bcm_field_qualify_Ip6FlowLabel(
     int unit, 
@@ -9376,6 +9418,12 @@ extern int bcm_field_qualify_ForwardingType(
     int unit, 
     bcm_field_entry_t entry, 
     bcm_field_ForwardingType_t type);
+
+/* bcm_field_qualify_AppType */
+extern int bcm_field_qualify_AppType(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_AppType_t type);
 
 /* bcm_field_qualify_IpType */
 extern int bcm_field_qualify_IpType(
@@ -10057,6 +10105,16 @@ extern int bcm_field_qualify_InPorts_get(
     bcm_pbmp_t *mask);
 
 /* 
+ * Get match criteria for bcmFieldQualifyOutPorts
+ *                qualifier from the field entry.
+ */
+extern int bcm_field_qualify_OutPorts_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_pbmp_t *data, 
+    bcm_pbmp_t *mask);
+
+/* 
  * Get match criteria for bcmFieldQualifyDrop
  *                qualifier from the field entry.
  */
@@ -10442,6 +10500,16 @@ extern int bcm_field_qualify_Ip6TrafficClass_get(
     uint8 *mask);
 
 /* 
+ * Get match criteria for bcmFieldQualifyInnerIp6FlowLabel
+ *                qualifier from the field entry.
+ */
+extern int bcm_field_qualify_InnerIp6FlowLabel_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* 
  * Get match criteria for bcmFieldQualifyIp6FlowLabel
  *                qualifier from the field entry.
  */
@@ -10558,6 +10626,15 @@ extern int bcm_field_qualify_ForwardingType_get(
     int unit, 
     bcm_field_entry_t entry, 
     bcm_field_ForwardingType_t *type);
+
+/* 
+ * Get match criteria for bcmFieldQualifyAppType
+ *                qualifier from the field entry.
+ */
+extern int bcm_field_qualify_AppType_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_AppType_t *type);
 
 /* 
  * Get match criteria for bcmFieldQualifyIpType
@@ -11251,6 +11328,91 @@ extern int bcm_field_qualify_FabricQueueTag_get(
     uint32 *data, 
     uint32 *mask);
 
+/* bcm_field_qualify_FlowId */
+extern int bcm_field_qualify_FlowId(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint16 data, 
+    uint16 mask);
+
+/* bcm_field_qualify_InVPort */
+extern int bcm_field_qualify_InVPort(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* bcm_field_qualify_OutVPort */
+extern int bcm_field_qualify_OutVPort(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* bcm_field_qualify_InVPort32 */
+extern int bcm_field_qualify_InVPort32(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* bcm_field_qualify_OutVPort32 */
+extern int bcm_field_qualify_OutVPort32(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyFlowId
+ *                qualifier from the field entry.
+ */
+extern int bcm_field_qualify_FlowId_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint16 *data, 
+    uint16 *mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyInVPort
+ *                qualifier from the field entry (8-bits).
+ */
+extern int bcm_field_qualify_InVPort_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyOutVPort
+ *                qualifier from the field entry (8-bits).
+ */
+extern int bcm_field_qualify_OutVPort_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyInVPort
+ *                qualifier from the field entry (32-bits).
+ */
+extern int bcm_field_qualify_InVPort32_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyOutVPort
+ *                qualifier from the field entry (32-bits).
+ */
+extern int bcm_field_qualify_OutVPort32_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
 /* 
  * Set match criteria for RepCopy
  *                qualifier.
@@ -11772,6 +11934,26 @@ extern int bcm_field_qualify_MplsForwardingLabelAction_get(
     uint8 *mask);
 
 /* 
+ * Set match criteria for MplsForwardingLabelAction
+ *                qualifier (32 bits).
+ */
+extern int bcm_field_qualify_MplsForwardingLabelAction32(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* 
+ * Get match criteria for MplsForwardingLabelAction
+ *                qualifier (32 bits).
+ */
+extern int bcm_field_qualify_MplsForwardingLabelAction32_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* 
  * Set match criteria for MplsControlWordValid
  *                qualifier.
  */
@@ -11917,6 +12099,232 @@ extern int bcm_field_qualify_SrcGport_get(
     bcm_field_entry_t entry, 
     bcm_gport_t *port_id);
 
+/* 
+ * Set match for the header format indicated.  This qualifier is similar
+ * to HeaderFormatSet, but this one allows only one matching header
+ * format to be specified.
+ */
+extern int bcm_field_qualify_HeaderFormat(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_header_format_t header_format);
+
+/* Get matching header format. */
+extern int bcm_field_qualify_HeaderFormat_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_header_format_t *header_format);
+
+/* 
+ * Set match for the header formats included in the format_header_set. 
+ * This qualifier is similar to HeaderFormat, but this qualifier allows
+ * the caller to specify more than one header format to match.
+ */
+extern int bcm_field_qualify_HeaderFormatSet(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_header_format_set_t header_format_set);
+
+/* Get matching header format set. */
+extern int bcm_field_qualify_HeaderFormatSet_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_header_format_set_t *header_format_set);
+
+/* Set match criteria for L2Learn qualifier. */
+extern int bcm_field_qualify_L2Learn(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for L2Learn qualifier. */
+extern int bcm_field_qualify_L2Learn_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for PortOrientation qualifier. */
+extern int bcm_field_qualify_PortOrientation(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for PortOrientation qualifier. */
+extern int bcm_field_qualify_PortOrientation_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for PortOrientation qualifier. */
+extern int bcm_field_qualify_EcnValue(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for EcnValue qualifier. */
+extern int bcm_field_qualify_EcnValue_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for RxTrapCode qualifier. */
+extern int bcm_field_qualify_RxTrapCode(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_rx_trap_t data);
+
+/* Get match criteria for RxTrapCode qualifier. */
+extern int bcm_field_qualify_RxTrapCode_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_rx_trap_t *data);
+
+/* Set match criteria for Ptch qualifier. */
+extern int bcm_field_qualify_Ptch(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for Ptch qualifier. */
+extern int bcm_field_qualify_Ptch_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for MplsBos qualifier. */
+extern int bcm_field_qualify_MplsBos(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for MplsBos qualifier. */
+extern int bcm_field_qualify_MplsBos_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for RxTrapData qualifier. */
+extern int bcm_field_qualify_RxTrapData(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* Get match criteria for RxTrapData qualifier. */
+extern int bcm_field_qualify_RxTrapData_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* Set match criteria for PolicerIntPrio qualifier. */
+extern int bcm_field_qualify_PolicerIntPrio(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for PolicerIntPrio qualifier. */
+extern int bcm_field_qualify_PolicerIntPrio_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for PacketTerminatedBytes qualifier. */
+extern int bcm_field_qualify_PacketTerminatedBytes(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* Get match criteria for PacketTerminatedBytes qualifier. */
+extern int bcm_field_qualify_PacketTerminatedBytes_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* Set match criteria for BypassFilter qualifier (8-bits). */
+extern int bcm_field_qualify_BypassFilter(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for BypassFilter qualifier (8-bits). */
+extern int bcm_field_qualify_BypassFilter_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for BypassFilter qualifier (32-bits). */
+extern int bcm_field_qualify_BypassFilter32(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* Get match criteria for BypassFilter qualifier (32-bits). */
+extern int bcm_field_qualify_BypassFilter32_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* Set match criteria for ReplicantAny qualifier. */
+extern int bcm_field_qualify_ReplicantAny(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for ReplicantAny qualifier. */
+extern int bcm_field_qualify_ReplicantAny_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for ReplicantFirst qualifier. */
+extern int bcm_field_qualify_ReplicantFirst(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for ReplicantFirst qualifier. */
+extern int bcm_field_qualify_ReplicantFirst_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for TrillEgressRbridge qualifier. */
+extern int bcm_field_qualify_TrillEgressRbridge(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* Get match criteria for TrillEgressRbridge qualifier. */
+extern int bcm_field_qualify_TrillEgressRbridge_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
 /* Set match criteria for ISid qualifier. */
 extern int bcm_field_qualify_ISid(
     int unit, 
@@ -11930,6 +12338,88 @@ extern int bcm_field_qualify_ISid_get(
     bcm_field_entry_t entry, 
     uint32 *data, 
     uint32 *mask);
+
+/* Set match criteria for InterfaceClassProcessingPort qualifier. */
+extern int bcm_field_qualify_InterfaceClassProcessingPort(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* Get match criteria for InterfaceClassProcessingPort qualifier. */
+extern int bcm_field_qualify_InterfaceClassProcessingPort_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* Set match criteria for DstRpfGport qualifier. */
+extern int bcm_field_qualify_DstRpfGport(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_gport_t data);
+
+/* Get match criteria for DstRpfGport qualifier. */
+extern int bcm_field_qualify_DstRpfGport_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_gport_t *data);
+
+/* Set match criteria for TrunkHashResult qualifier. */
+extern int bcm_field_qualify_TrunkHashResult(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* Get match criteria for TrunkHashResult qualifier. */
+extern int bcm_field_qualify_TrunkHashResult_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* Set match criteria for Dhcp qualifier. */
+extern int bcm_field_qualify_Dhcp(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for Dhcp qualifier. */
+extern int bcm_field_qualify_Dhcp_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for SnoopCopy qualifier. */
+extern int bcm_field_qualify_SnoopCopy(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for SnoopCopy qualifier. */
+extern int bcm_field_qualify_SnoopCopy_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for ForwardCopy qualifier. */
+extern int bcm_field_qualify_ForwardCopy(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for ForwardCopy qualifier. */
+extern int bcm_field_qualify_ForwardCopy_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
 
 /* Set match criteria for InterfaceClassVPort qualifier. */
 extern int bcm_field_qualify_InterfaceClassVPort(
@@ -11960,6 +12450,546 @@ extern int bcm_field_qualify_L4PortRangeCheck_get(
     bcm_field_range_t *range, 
     int *invert, 
     int *count);
+
+/* Set match criteria for VPortRangeCheck qualifier. */
+extern int bcm_field_qualify_VPortRangeCheck(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_range_t range, 
+    int invert);
+
+/* 
+ * Get match criteria for VPortRangeCheck
+ *                qualifier from the field entry.
+ */
+extern int bcm_field_qualify_VPortRangeCheck_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    int max_count, 
+    bcm_field_range_t *range, 
+    int *invert, 
+    int *count);
+
+/* Set match criteria for PacketLengthRangeCheck qualifier. */
+extern int bcm_field_qualify_PacketLengthRangeCheck(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_range_t range, 
+    int invert);
+
+/* 
+ * Get match criteria for PacketLengthRangeCheck
+ *                qualifier from the field entry.
+ */
+extern int bcm_field_qualify_PacketLengthRangeCheck_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    int max_count, 
+    bcm_field_range_t *range, 
+    int *invert, 
+    int *count);
+
+/* Set match criteria for TunnelTerminatedHit qualifier. */
+extern int bcm_field_qualify_TunnelTerminatedHit(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for TunnelTerminatedHit qualifier. */
+extern int bcm_field_qualify_TunnelTerminatedHit_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for MplsTerminatedHit qualifier. */
+extern int bcm_field_qualify_MplsTerminatedHit(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for MplsTerminatedHit qualifier. */
+extern int bcm_field_qualify_MplsTerminatedHit_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for L3SrcRouteHit qualifier. */
+extern int bcm_field_qualify_L3SrcRouteHit(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for L3SrcRouteHit qualifier. */
+extern int bcm_field_qualify_L3SrcRouteHit_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for IpmcHit qualifier. */
+extern int bcm_field_qualify_IpmcHit(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for IpmcHit qualifier. */
+extern int bcm_field_qualify_IpmcHit_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for VlanTranslationValue qualifier. */
+extern int bcm_field_qualify_VlanTranslationValue(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* Get match criteria for VlanTranslationValue qualifier. */
+extern int bcm_field_qualify_VlanTranslationValue_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* Set match criteria for TunnelTerminatedValue qualifier. */
+extern int bcm_field_qualify_TunnelTerminatedValue(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* Get match criteria for TunnelTerminatedValue qualifier. */
+extern int bcm_field_qualify_TunnelTerminatedValue_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* Set match criteria for MplsTerminatedValue qualifier. */
+extern int bcm_field_qualify_MplsTerminatedValue(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* Get match criteria for MplsTerminatedValue qualifier. */
+extern int bcm_field_qualify_MplsTerminatedValue_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* Set match criteria for IpTunnelValue qualifier. */
+extern int bcm_field_qualify_IpTunnelValue(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* Get match criteria for IpTunnelValue qualifier. */
+extern int bcm_field_qualify_IpTunnelValue_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* Set match criteria for L2SrcValue qualifier. */
+extern int bcm_field_qualify_L2SrcValue(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* Get match criteria for L2SrcValue qualifier. */
+extern int bcm_field_qualify_L2SrcValue_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* Set match criteria for L2DestValue qualifier. */
+extern int bcm_field_qualify_L2DestValue(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* Get match criteria for L2DestValue qualifier. */
+extern int bcm_field_qualify_L2DestValue_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* Set match criteria for L3SrcRouteValue qualifier. */
+extern int bcm_field_qualify_L3SrcRouteValue(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* Get match criteria for L3SrcRouteValue qualifier. */
+extern int bcm_field_qualify_L3SrcRouteValue_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* Set match criteria for L3DestRouteValue qualifier. */
+extern int bcm_field_qualify_L3DestRouteValue(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* Get match criteria for L3DestRouteValue qualifier. */
+extern int bcm_field_qualify_L3DestRouteValue_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* Set match criteria for IpmcValue qualifier. */
+extern int bcm_field_qualify_IpmcValue(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* Get match criteria for IpmcValue qualifier. */
+extern int bcm_field_qualify_IpmcValue_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* Set match criteria for CascadedKeyValue qualifier. */
+extern int bcm_field_qualify_CascadedKeyValue(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* Get match criteria for CascadedKeyValue qualifier. */
+extern int bcm_field_qualify_CascadedKeyValue_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* Set match criteria for LearnSrcMac qualifier. */
+extern int bcm_field_qualify_LearnSrcMac(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_mac_t data, 
+    bcm_mac_t mask);
+
+/* Get match criteria for LearnSrcMac qualifier. */
+extern int bcm_field_qualify_LearnSrcMac_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_mac_t *data, 
+    bcm_mac_t *mask);
+
+/* Set match criteria for LearnVlan qualifier. */
+extern int bcm_field_qualify_LearnVlan(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_vlan_t data, 
+    bcm_vlan_t mask);
+
+/* Get match criteria for LearnVlan qualifier. */
+extern int bcm_field_qualify_LearnVlan_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_vlan_t *data, 
+    bcm_vlan_t *mask);
+
+/* Set match criteria for LearnSrcPort qualifier. */
+extern int bcm_field_qualify_LearnSrcPort(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_gport_t data);
+
+/* Get match criteria for LearnSrcPort qualifier. */
+extern int bcm_field_qualify_LearnSrcPort_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_gport_t *data);
+
+/* Set match criteria for PacketSize qualifier. */
+extern int bcm_field_qualify_PacketSize(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* Get match criteria for PacketSize qualifier. */
+extern int bcm_field_qualify_PacketSize_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* Set match criteria for InnerSrcMac qualifier. */
+extern int bcm_field_qualify_InnerSrcMac(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_mac_t data, 
+    bcm_mac_t mask);
+
+/* Get match criteria for InnerSrcMac qualifier. */
+extern int bcm_field_qualify_InnerSrcMac_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_mac_t *data, 
+    bcm_mac_t *mask);
+
+/* Set match criteria for InnerDstMac qualifier. */
+extern int bcm_field_qualify_InnerDstMac(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_mac_t data, 
+    bcm_mac_t mask);
+
+/* Get match criteria for InnerDstMac qualifier. */
+extern int bcm_field_qualify_InnerDstMac_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_mac_t *data, 
+    bcm_mac_t *mask);
+
+/* Set match criteria for InnerEtherType qualifier. */
+extern int bcm_field_qualify_InnerEtherType(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint16 data, 
+    uint16 mask);
+
+/* Get match criteria for InnerEtherType qualifier. */
+extern int bcm_field_qualify_InnerEtherType_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint16 *data, 
+    uint16 *mask);
+
+/* Set match criteria for MplsLabel1 qualifier. */
+extern int bcm_field_qualify_MplsLabel1(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* Get match criteria for MplsLabel1 qualifier. */
+extern int bcm_field_qualify_MplsLabel1_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* Set match criteria for MplsLabel1Ttl qualifier. */
+extern int bcm_field_qualify_MplsLabel1Ttl(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for MplsLabel1Ttl qualifier. */
+extern int bcm_field_qualify_MplsLabel1Ttl_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for MplsLabel1Bos qualifier. */
+extern int bcm_field_qualify_MplsLabel1Bos(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for MplsLabel1Bos qualifier. */
+extern int bcm_field_qualify_MplsLabel1Bos_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for MplsLabel1Exp qualifier. */
+extern int bcm_field_qualify_MplsLabel1Exp(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for MplsLabel1Exp qualifier. */
+extern int bcm_field_qualify_MplsLabel1Exp_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for MplsLabel1Id qualifier. */
+extern int bcm_field_qualify_MplsLabel1Id(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* Get match criteria for MplsLabel1Id qualifier. */
+extern int bcm_field_qualify_MplsLabel1Id_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* Set match criteria for MplsLabel2 qualifier. */
+extern int bcm_field_qualify_MplsLabel2(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* Get match criteria for MplsLabel2 qualifier. */
+extern int bcm_field_qualify_MplsLabel2_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* Set match criteria for MplsLabel2Ttl qualifier. */
+extern int bcm_field_qualify_MplsLabel2Ttl(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for MplsLabel2Ttl qualifier. */
+extern int bcm_field_qualify_MplsLabel2Ttl_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for MplsLabel2Bos qualifier. */
+extern int bcm_field_qualify_MplsLabel2Bos(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for MplsLabel2Bos qualifier. */
+extern int bcm_field_qualify_MplsLabel2Bos_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for MplsLabel2Exp qualifier. */
+extern int bcm_field_qualify_MplsLabel2Exp(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for MplsLabel2Exp qualifier. */
+extern int bcm_field_qualify_MplsLabel2Exp_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for MplsLabel2Id qualifier. */
+extern int bcm_field_qualify_MplsLabel2Id(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* Get match criteria for MplsLabel2Id qualifier. */
+extern int bcm_field_qualify_MplsLabel2Id_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* Set match criteria for MplsLabel3 qualifier. */
+extern int bcm_field_qualify_MplsLabel3(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* Get match criteria for MplsLabel3 qualifier. */
+extern int bcm_field_qualify_MplsLabel3_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* Set match criteria for MplsLabel3Ttl qualifier. */
+extern int bcm_field_qualify_MplsLabel3Ttl(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for MplsLabel3Ttl qualifier. */
+extern int bcm_field_qualify_MplsLabel3Ttl_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for MplsLabel3Bos qualifier. */
+extern int bcm_field_qualify_MplsLabel3Bos(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for MplsLabel3Bos qualifier. */
+extern int bcm_field_qualify_MplsLabel3Bos_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for MplsLabel3Exp qualifier. */
+extern int bcm_field_qualify_MplsLabel3Exp(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* Get match criteria for MplsLabel3Exp qualifier. */
+extern int bcm_field_qualify_MplsLabel3Exp_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* Set match criteria for MplsLabel3Id qualifier. */
+extern int bcm_field_qualify_MplsLabel3Id(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* Get match criteria for MplsLabel3Id qualifier. */
+extern int bcm_field_qualify_MplsLabel3Id_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
 
 /* Qualify on Exact Match Hit Status. */
 extern int bcm_field_qualify_ExactMatchHitStatus(
@@ -11999,6 +13029,14 @@ extern int bcm_field_qualify_ExactMatchGroupClassId(
     bcm_field_entry_t entry, 
     int group_pri, 
     bcm_field_group_t group);
+
+/* Get action core specific parameters from a specified entry. */
+extern int bcm_field_action_config_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_action_t action, 
+    int core_config_arr_len, 
+    bcm_field_action_core_config_t *core_config_arr);
 
 /* Get match criteria for ExactMatchGroupClassId qualifier. */
 extern int bcm_field_qualify_ExactMatchGroupClassId_get(
@@ -12109,7 +13147,38 @@ extern int bcm_field_action_remove_all(
 
 #endif /* BCM_HIDE_DISPATCHABLE */
 
+/* Initialize a bcm_field_extraction_field_t. */
+extern void bcm_field_extraction_field_t_init(
+    bcm_field_extraction_field_t *action);
+
+/* Initialize a bcm_field_extraction_action_t. */
+extern void bcm_field_extraction_action_t_init(
+    bcm_field_extraction_action_t *action);
+
 #ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * Add an action to a direct extraction field entry (an entry that is a
+ * member of a direct extraction group).
+ */
+extern int bcm_field_direct_extraction_action_add(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_extraction_action_t action, 
+    int count, 
+    bcm_field_extraction_field_t *extractions);
+
+/* 
+ * Get an action from a direct extraction field entry (an entry that is a
+ * member of a direct extraction group).
+ */
+extern int bcm_field_direct_extraction_action_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_extraction_action_t *action, 
+    int max_count, 
+    bcm_field_extraction_field_t *extractions, 
+    int *actual_count);
 
 /* Create stat collection entity. */
 extern int bcm_field_stat_create(
@@ -12129,6 +13198,16 @@ extern int bcm_field_stat_create_id(
     int nstat, 
     bcm_field_stat_t *stat_arr, 
     int stat_id);
+
+/* 
+ * Get flex stat counter ID associated with given field group and its
+ * associated stats ID.
+ */
+extern int bcm_field_stat_id_get(
+    int unit, 
+    bcm_field_group_t group, 
+    uint32 stat_id, 
+    uint32 *stat_counter_id);
 
 /* Destroy stat collection entity. */
 extern int bcm_field_stat_destroy(
@@ -12261,6 +13340,10 @@ extern void bcm_field_qset_t_init(
 extern void bcm_field_aset_t_init(
     bcm_field_aset_t *aset);
 
+/* Initialize the bcm_field_presel_set_t structure. */
+extern void bcm_field_presel_set_t_init(
+    bcm_field_presel_set_t *presel_set);
+
 /* Initialize the Field Group Status structure. */
 extern void bcm_field_group_status_t_init(
     bcm_field_group_status_t *fgroup);
@@ -12298,6 +13381,34 @@ extern int bcm_field_group_dump(
 #define bcm_field_qualify_OutVlan   bcm_field_qualify_OuterVlan 
 #define bcm_field_qualify_InVlan    bcm_field_qualify_InnerVlan 
 
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* Attach counters entries to a field group */
+extern int bcm_field_stat_attach(
+    int unit, 
+    bcm_field_group_t group, 
+    uint32 stat_counter_id, 
+    uint32 *stat_id);
+
+/* Destroy a preselection specification. */
+extern int bcm_field_presel_destroy(
+    int unit, 
+    bcm_field_presel_t presel_id);
+
+/* Associate a set of preselectors with a Field group. */
+extern int bcm_field_group_presel_set(
+    int unit, 
+    bcm_field_group_t group, 
+    bcm_field_presel_set_t *presel);
+
+/* Get the set of preselectors associated with a Field group. */
+extern int bcm_field_group_presel_get(
+    int unit, 
+    bcm_field_group_t group, 
+    bcm_field_presel_set_t *presel);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
 /* Field entry operation structure. */
 typedef struct bcm_field_entry_oper_s {
     uint32 flags;               /* Entry operation BCM_FIELD_ENTRY_OPER_XXX. */
@@ -12334,6 +13445,26 @@ extern int bcm_field_qualify_data_get(
     uint8 *data, 
     uint8 *mask, 
     uint16 *length);
+
+/* Allocate a range checker according to multiple range types */
+extern int bcm_field_range_multi_create(
+    int unit, 
+    bcm_field_range_t *range_id, 
+    uint32 create_flags, 
+    int count, 
+    uint32 *range_flags, 
+    uint32 *min_value, 
+    uint32 *max_value);
+
+/* Retrieve parameters associated with an existing multi-range checker */
+extern int bcm_field_range_multi_get(
+    int unit, 
+    bcm_field_range_t range_id, 
+    int max_count, 
+    uint32 *range_flags, 
+    uint32 *minimum_value, 
+    uint32 *maxamum_value, 
+    int *actual_count);
 
 /* 
  * Set match criteria for bcmFieldQualifyIngressClassField
@@ -12374,6 +13505,264 @@ extern int bcm_field_qualify_IngressInterfaceClassPort_get(
     bcm_field_entry_t entry, 
     uint32 *data, 
     uint32 *mask);
+
+/* 
+ * Set match criteria for bcmFieldQualifyExternalValue0
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalValue0(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyExternalValue0
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalValue0_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* 
+ * Set match criteria for bcmFieldQualifyExternalValue1
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalValue1(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyExternalValue1
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalValue1_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* 
+ * Set match criteria for bcmFieldQualifyExternalValue2
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalValue2(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyExternalValue2
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalValue2_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* 
+ * Set match criteria for bcmFieldQualifyExternalValue3
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalValue3(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyExternalValue3
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalValue3_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* 
+ * Set match criteria for bcmFieldQualifyExternalValue4
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalValue4(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyExternalValue4
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalValue4_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* 
+ * Set match criteria for bcmFieldQualifyExternalValue5
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalValue5(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 data, 
+    uint64 mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyExternalValue5
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalValue5_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint64 *data, 
+    uint64 *mask);
+
+/* 
+ * Set match criteria for bcmFieldQualifyExternalHit0
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalHit0(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyExternalHit0
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalHit0_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* 
+ * Set match criteria for bcmFieldQualifyExternalHit1
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalHit1(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyExternalHit1
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalHit1_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* 
+ * Set match criteria for bcmFieldQualifyExternalHit2
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalHit2(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyExternalHit2
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalHit2_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* 
+ * Set match criteria for bcmFieldQualifyExternalHit3
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalHit3(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyExternalHit3
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalHit3_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* 
+ * Set match criteria for bcmFieldQualifyExternalHit4
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalHit4(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyExternalHit4
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalHit4_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* 
+ * Set match criteria for bcmFieldQualifyExternalHit5
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalHit5(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyExternalHit5
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ExternalHit5_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* 
+ * Set match criteria for bcmFieldQualifyVpnUnknownDstMacDstPort
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_VpnUnknownDstMacDstPort(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_gport_t port_id);
+
+/* 
+ * Get match criteria for bcmFieldQualifyVpnUnknownDstMacDstPort
+ *                qualifier in the field entry.
+ */
+extern int bcm_field_qualify_VpnUnknownDstMacDstPort_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_gport_t *port_id);
 
 /* 
  *  Set match criteria for bcmFieldQualifyVxlanNetworkId
@@ -12490,6 +13879,244 @@ extern int bcm_field_qualify_IcmpError(
  *                  qualifier in the field entry.
  */
 extern int bcm_field_qualify_IcmpError_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* 
+ *  Set match criteria for bcmFieldQualifyTunnelId
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_TunnelId(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* 
+ *  Get match criteria for bcmFieldQualifyTunnelId
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_TunnelId_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* 
+ *  Set match criteria for bcmFieldQualifyArpSenderIp4
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ArpSenderIp4(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* 
+ *  Get match criteria for bcmFieldQualifyArpSenderIp4
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ArpSenderIp4_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* 
+ *  Set match criteria for bcmFieldQualifyArpTargetIp4
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ArpTargetIp4(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* 
+ *  Get match criteria for bcmFieldQualifyArpTargetIp4
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ArpTargetIp4_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* 
+ *  Set match criteria for bcmFieldQualifyArpOpcode
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ArpOpcode(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_ArpOpcode_t data);
+
+/* 
+ *  Get match criteria for bcmFieldQualifyArpOpcode
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ArpOpcode_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_ArpOpcode_t *data);
+
+/* 
+ *  Set match criteria for bcmFieldQualifyTranslatedOuterVlan
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_TranslatedOuterVlan(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_vlan_t data, 
+    bcm_vlan_t mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyTranslatedOuterVlan
+ *                qualifier from the field entry.
+ */
+extern int bcm_field_qualify_TranslatedOuterVlan_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_vlan_t *data, 
+    bcm_vlan_t *mask);
+
+/* 
+ *  Set match criteria for bcmFieldQualifyTranslatedOuterVlanId
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_TranslatedOuterVlanId(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_vlan_t data, 
+    bcm_vlan_t mask);
+
+/* 
+ *  Get match criteria for bcmFieldQualifyTranslatedOuterVlanId
+ *                  qualifier from the field entry.
+ */
+extern int bcm_field_qualify_TranslatedOuterVlanId_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_vlan_t *data, 
+    bcm_vlan_t *mask);
+
+/* 
+ *  Set match criteria for bcmFieldQualifyTranslatedOuterVlanPri
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_TranslatedOuterVlanPri(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* 
+ *  Get match criteria for bcmFieldQualifyTranslatedOuterVlanPri
+ *                  qualifier from the field entry.
+ */
+extern int bcm_field_qualify_TranslatedOuterVlanPri_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* 
+ *  Set match criteria for bcmFieldQualifyTranslatedOuterVlanCfi
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_TranslatedOuterVlanCfi(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* 
+ *  Get match criteria for bcmFieldQualifyTranslatedOuterVlanCfi_get
+ *                  qualifier from the field entry.
+ */
+extern int bcm_field_qualify_TranslatedOuterVlanCfi_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* 
+ *  Set match criteria for bcmFieldQualifyTranslatedInnerVlan
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_TranslatedInnerVlan(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_vlan_t data, 
+    bcm_vlan_t mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyTranslatedInnerVlan
+ *                qualifier from the field entry.
+ */
+extern int bcm_field_qualify_TranslatedInnerVlan_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_vlan_t *data, 
+    bcm_vlan_t *mask);
+
+/* 
+ *  Set match criteria for bcmFieldQualifyTranslatedInnerVlanId
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_TranslatedInnerVlanId(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_vlan_t data, 
+    bcm_vlan_t mask);
+
+/* 
+ *  Get match criteria for bcmFieldQualifyTranslatedInnerVlanId
+ *                  qualifier from the field entry.
+ */
+extern int bcm_field_qualify_TranslatedInnerVlanId_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_vlan_t *data, 
+    bcm_vlan_t *mask);
+
+/* 
+ *  Set match criteria for bcmFieldQualifyTranslatedInnerVlanPri
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_TranslatedInnerVlanPri(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* 
+ *  Get match criteria for bcmFieldQualifyTranslatedInnerVlanPri
+ *                  qualifier from the field entry.
+ */
+extern int bcm_field_qualify_TranslatedInnerVlanPri_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* 
+ *  Set match criteria for bcmFieldQualifyTranslatedInnerVlanCfi
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_TranslatedInnerVlanCfi(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* 
+ *  Get match criteria for bcmFieldQualifyTranslatedInnerVlanCfi_get
+ *                  qualifier from the field entry.
+ */
+extern int bcm_field_qualify_TranslatedInnerVlanCfi_get(
     int unit, 
     bcm_field_entry_t entry, 
     uint8 *data, 
@@ -12776,6 +14403,26 @@ extern int bcm_field_qualify_FcoeSOF_get(
     uint8 *mask);
 
 /* 
+ *  Set match criteria for bcmFieldQualifyFibreChanZoneCheck
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_FibreChanZoneCheck(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* 
+ *  Get match criteria for bcmFieldQualifyFibreChanZoneCheck
+ *                  qualifier from the field entry.
+ */
+extern int bcm_field_qualify_FibreChanZoneCheck_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
+
+/* 
  *  Set match criteria for bcmFieldQualifyFibreChanSrcFpmaCheck
  *                  qualifier in the field entry.
  */
@@ -12854,6 +14501,28 @@ extern int bcm_field_qualify_FibreChanVFTValid_get(
     bcm_field_entry_t entry, 
     uint8 *data, 
     uint8 *mask);
+
+/* 
+ *  Set match criteria for bcmFieldQualifyForwardingHeaderOffset
+ *                  qualifier in the field entry.
+ */
+extern int bcm_field_qualify_ForwardingHeaderOffset(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_data_offset_base_t base_header, 
+    uint32 data, 
+    uint32 mask);
+
+/* 
+ *  Get match criteria for bcmFieldQualifyForwardingHeaderOffset
+ *                  qualifier from the field entry.
+ */
+extern int bcm_field_qualify_ForwardingHeaderOffset_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    bcm_field_data_offset_base_t *base_header, 
+    uint32 *data, 
+    uint32 *mask);
 
 #endif /* BCM_HIDE_DISPATCHABLE */
 
@@ -13154,6 +14823,23 @@ typedef enum bcm_field_MplsOam_Control_pktType_e {
 }
 
 #ifndef BCM_HIDE_DISPATCHABLE
+
+/* bcm_field_qualify_L3SrcBind */
+extern int bcm_field_qualify_L3SrcBind(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 data, 
+    uint8 mask);
+
+/* 
+ * Get match criteria for bcmFieldQualifyL3SrcBind
+ *                qualifier from the field entry.
+ */
+extern int bcm_field_qualify_L3SrcBind_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint8 *data, 
+    uint8 *mask);
 
 /* bcm_field_qualify_ETag */
 extern int bcm_field_qualify_ETag(
@@ -15843,6 +17529,60 @@ extern int bcm_field_qualify_TrunkMemberSourceModuleId_get(
     bcm_field_entry_t entry, 
     int *data, 
     int *mask);
+
+/* Map a presel id to a name */
+extern int bcm_field_presel_config_set(
+    int unit, 
+    bcm_field_presel_t presel_id, 
+    bcm_field_presel_config_t *presel_config);
+
+/* Get name from presel id */
+extern int bcm_field_presel_config_get(
+    int unit, 
+    bcm_field_presel_t presel_id, 
+    bcm_field_presel_config_t *presel_config);
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
+/* Initialize Field Presel Config structure */
+extern void bcm_field_presel_config_t_init(
+    bcm_field_presel_config_t *presel_config);
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+/* 
+ * This API Qualify on forwarding TTL. may be selected on tunnel basis to
+ * be taken from the tunnel layer or forwarding layer.
+ */
+extern int bcm_field_qualify_GeneratedTtl(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* 
+ * This API Qualify on forwarding TTL. may be selected on tunnel basis to
+ * be taken from the tunnel layer or forwarding layer.
+ */
+extern int bcm_field_qualify_GeneratedTtl_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
+
+/* Set match criteria for bcmFieldQualifyIpMulticastCompatible */
+extern int bcm_field_qualify_IpMulticastCompatible(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 data, 
+    uint32 mask);
+
+/* Set match criteria for bcmFieldQualifyIpMulticastCompatible_get */
+extern int bcm_field_qualify_IpMulticastCompatible_get(
+    int unit, 
+    bcm_field_entry_t entry, 
+    uint32 *data, 
+    uint32 *mask);
 
 #endif /* BCM_HIDE_DISPATCHABLE */
 

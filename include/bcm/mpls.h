@@ -1,5 +1,4 @@
 /*
- * 
  * This software is governed by the Broadcom Switch APIs license.
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenNSA/master/Legal/LICENSE file.
  * 
@@ -837,6 +836,15 @@ extern int bcm_mpls_tunnel_initiator_set(
 #endif
 
 #if defined(INCLUDE_L3)
+/* bcm_mpls_tunnel_initiator_create */
+extern int bcm_mpls_tunnel_initiator_create(
+    int unit, 
+    bcm_if_t intf, 
+    int num_labels, 
+    bcm_mpls_egress_label_t *label_array);
+#endif
+
+#if defined(INCLUDE_L3)
 /* Clear the MPLS tunnel initiator parameters for an L3 interface. */
 extern int bcm_mpls_tunnel_initiator_clear(
     int unit, 
@@ -910,6 +918,13 @@ typedef struct bcm_mpls_tunnel_encap_s {
 #if defined(INCLUDE_L3)
 /* Add an MPLS label entry. */
 extern int bcm_mpls_tunnel_switch_add(
+    int unit, 
+    bcm_mpls_tunnel_switch_t *info);
+#endif
+
+#if defined(INCLUDE_L3)
+/* Add an MPLS label entry. */
+extern int bcm_mpls_tunnel_switch_create(
     int unit, 
     bcm_mpls_tunnel_switch_t *info);
 #endif
@@ -1232,6 +1247,42 @@ typedef struct bcm_mpls_range_action_s {
 #define BCM_MPLS_RANGE_ACTION_CONTROL_WORD  0x00000010 /*  Indicate that all the
                                                           labels in the range
                                                           have CW */
+
+#ifndef BCM_HIDE_DISPATCHABLE
+
+#if defined(INCLUDE_L3)
+/* Set range of labels per in lif. */
+extern int bcm_mpls_range_action_add(
+    int unit, 
+    bcm_mpls_label_t label_low, 
+    bcm_mpls_label_t label_high, 
+    bcm_mpls_range_action_t *action);
+#endif
+
+#if defined(INCLUDE_L3)
+/* Remove range of labels per in lif. */
+extern int bcm_mpls_range_action_remove(
+    int unit, 
+    bcm_mpls_label_t label_low, 
+    bcm_mpls_label_t label_high);
+#endif
+
+#if defined(INCLUDE_L3)
+/* Get range of labels per in lif. */
+extern int bcm_mpls_range_action_get(
+    int unit, 
+    bcm_mpls_label_t label_low, 
+    bcm_mpls_label_t label_high, 
+    bcm_mpls_range_action_t *action);
+#endif
+
+#endif /* BCM_HIDE_DISPATCHABLE */
+
+#if defined(INCLUDE_L3)
+/* Initialize the MPLS range action structure. */
+extern void bcm_mpls_range_action_t_init(
+    bcm_mpls_range_action_t *label);
+#endif
 
 #if defined(INCLUDE_L3)
 /* Mpls Special push type element structure. */
