@@ -33,6 +33,7 @@ This release supports the following devices:
 * BCM56960 "Tomahawk"
 * BCM56970 "Tomahawk2"
 * BCM56980 "Tomahawk3"
+* BCM88470 "Qumran AX"
 
 Build configuration
 ======================
