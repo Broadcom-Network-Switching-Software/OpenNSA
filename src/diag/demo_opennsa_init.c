@@ -32,6 +32,10 @@
 #include <sal/core/boot.h>
 #include <linux-bde.h>
 
+#ifdef BCM_WARM_BOOT_SUPPORT
+#include <bcm/switch.h>
+#endif
+
 /*
  * These includes are needed for do_per_switch_setup() part of the demo.
  */
@@ -439,6 +443,17 @@ int do_per_switch_setup(int unit)
     return 0;
 }
 
+#ifdef BCM_WARM_BOOT_SUPPORT
+int scache_read_dummy_f( int unit, uint8 *buf, int offset, int nbytes )
+{
+    return SOC_E_RESOURCE;
+}
+
+int scache_write_dummy_f( int unit, uint8 *buf, int offset, int nbytes )
+{
+    return SOC_E_RESOURCE;
+}
+#endif
 
 /*
  * Main loop.
@@ -494,6 +509,24 @@ int main( int argc, char *argv[] )
                 rv = _sysconf_attach( i );
                 printf( "%s: soc_attach( %d ), result=%d\n",
                         (rv) ? "FAIL" : "SUCCESS", i, rv );
+
+#ifdef BCM_WARM_BOOT_SUPPORT
+                SOC_WARM_BOOT_DONE( i );
+                rv = soc_stable_set( i, BCM_SWITCH_STABLE_NONE, 0 );
+                printf( "%s: soc_stable_set( %d ), result=%d\n",
+                        (rv) ? "FAIL" : "SUCCESS", i, rv );
+
+                rv = soc_stable_size_set( i, 0 );
+                printf( "%s: soc_stable_size_set( %d ), result=%d\n",
+                        (rv) ? "FAIL" : "SUCCESS", i, rv );
+
+                rv = soc_switch_stable_register( i,
+                                                 scache_read_dummy_f,
+                                                 scache_write_dummy_f,
+                                                 NULL, NULL );
+                printf( "%s: soc_switch_stable_register( %d ), result=%d\n",
+                        (rv) ? "FAIL" : "SUCCESS", i, rv );
+#endif
 
                 rv = soc_reset_init( i );
                 printf( "%s: soc_reset_init( %d ), result=%d\n",
